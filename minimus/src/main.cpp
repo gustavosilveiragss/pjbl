@@ -4,7 +4,7 @@
 #include <array>
 
 constexpr std::array<int, 3> password_order{ 1, 0, 2 };
-constexpr std::array<gpio_num_t, 3> buttons{ GPIO_NUM_18, GPIO_NUM_19, GPIO_NUM_21 };
+constexpr std::array<gpio_num_t, 3> buttons{ GPIO_NUM_34, GPIO_NUM_35, GPIO_NUM_32 };
 
 void setup() {
     Serial.begin(115200);
@@ -15,7 +15,7 @@ void setup() {
 }
 
 void loop() {
-    analogWrite(GPIO_NUM_14, 128);
+    tone(GPIO_NUM_14, 1000);
 
     static auto tick = 0;
 
