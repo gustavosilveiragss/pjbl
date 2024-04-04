@@ -12,8 +12,9 @@ void setup() {
         pinMode(i, INPUT_PULLUP);
 
     pinMode(GPIO_NUM_14, OUTPUT);
+    pinMode(GPIO_NUM_35, INPUT_PULLUP);
 
-    // tone(GPIO_NUM_14, 1000);
+    tone(GPIO_NUM_14, 1000);
 }
 
 void loop() {
@@ -25,6 +26,8 @@ void loop() {
             Serial.printf("%d ", digitalRead(b));
 
         Serial.print("\n");
+
+        Serial.println(digitalRead(GPIO_NUM_35));
 
         tick = millis();
     }
