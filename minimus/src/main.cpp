@@ -12,16 +12,19 @@ void setup() {
         pinMode(i, INPUT_PULLUP);
 
     pinMode(GPIO_NUM_14, OUTPUT);
+
+    tone(GPIO_NUM_14, 1000);
 }
 
 void loop() {
-    tone(GPIO_NUM_14, 1000);
-
     static auto tick = 0;
 
     if (millis() - tick >= 1000) {
+        Serial.print("Botões: ");
         for (auto b : buttons)
-            Serial.println(digitalRead(b));
+            Serial.printf("%d ", digitalRead(b));
+
+        Serial.print("\n");
 
         tick = millis();
     }
