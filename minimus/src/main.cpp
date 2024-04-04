@@ -4,7 +4,7 @@
 #include <array>
 
 constexpr std::array<int, 3> password_order{ 1, 0, 2 };
-constexpr std::array<gpio_num_t, 3> buttons{ GPIO_NUM_34, GPIO_NUM_35, GPIO_NUM_32 };
+constexpr std::array<gpio_num_t, 3> buttons{ GPIO_NUM_27, GPIO_NUM_26, GPIO_NUM_25 };
 
 void setup() {
     Serial.begin(115200);
@@ -13,7 +13,7 @@ void setup() {
 
     pinMode(GPIO_NUM_14, OUTPUT);
 
-    tone(GPIO_NUM_14, 1000);
+    // tone(GPIO_NUM_14, 1000);
 }
 
 void loop() {
