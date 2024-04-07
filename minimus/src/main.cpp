@@ -14,7 +14,7 @@ void setup() {
     pinMode(GPIO_NUM_14, OUTPUT);
     pinMode(GPIO_NUM_35, INPUT_PULLUP);
 
-    tone(GPIO_NUM_14, 1000);
+    // tone(GPIO_NUM_14, 1000);
 }
 
 void loop() {

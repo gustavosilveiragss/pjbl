@@ -10,7 +10,7 @@ Firmware do esp32
 
 Middleware em python que conecta o node-red com o firmware
 
-# INDICE
+# MAXIMUS
 
 ### Latim para _dedo indicador_
 
