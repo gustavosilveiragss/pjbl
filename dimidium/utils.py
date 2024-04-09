@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import os
 
 BROKER_URL = "test.mosquitto.org"
 BROKER_PORT = 1883
@@ -9,3 +10,5 @@ TOP_PERMISSION_STATE = "PERMISSION_STATE"
 TOP_IR_STATE = "IR_STATE"
 TOP_PASSWORD = "PASSWORD"
 TOP_FREQUENCY = "FREQUENCY"
+
+DB_PATH = os.path.abspath(os.path.dirname(__file__)) + "/data/db.json"

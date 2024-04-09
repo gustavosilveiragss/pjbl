@@ -1,30 +1,37 @@
-import consts
-        
-def permission_state(payload):
-    print("Permission state")
+import utils
+import json
+from datetime import datetime
 
-def ir_state(payload):
-    print("IR state")
+def readDB(key):
+    with open(utils.DB_PATH, "r") as file:
+        dbObj = json.load(file)
+        return dbObj[key]['value']
+    
+def writeDB(key, payload):
+    with open(utils.DB_PATH, "r") as file:
+        dbObj = json.load(file)
+        val = {
+            "lastChanged": str(datetime.now()),
+            "value": payload
+        }
+        dbObj[key] = val
 
-def password(payload):
-    print("Password")
+    with open(utils.DB_PATH, "w") as file:
+        json.dump(dbObj, file)
 
-def frequency(payload):
-    print("Frequency")
-
-def handle_message(topic, payload):
+def handleMessage(topic, payload):
     match topic:
-        case consts.TOP_PERMISSION_STATE:
-            permission_state(payload)
+        case utils.TOP_PERMISSION_STATE:
+            writeDB(utils.TOP_PERMISSION_STATE, payload)
             return
-        case consts.TOP_IR_STATE:
-            ir_state(payload)
+        case utils.TOP_IR_STATE:
+            writeDB(utils.TOP_IR_STATE, payload)
             return
-        case consts.TOP_PASSWORD:
-            password(payload)
+        case utils.TOP_PASSWORD:
+            writeDB(utils.TOP_PASSWORD, payload)
             return
-        case consts.TOP_FREQUENCY:
-            frequency(payload)
+        case utils.TOP_FREQUENCY:
+            writeDB(utils.TOP_FREQUENCY, payload)
             return
         case _:
             print("Unknown topic")

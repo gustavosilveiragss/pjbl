@@ -1,15 +1,15 @@
 import paho.mqtt.client as mqtt
-import consts
-from handler import handle_message
+import utils
+from handler import handleMessage
 from datetime import datetime
 
 def onConnect(client, userdata, flags, rc, properties=None):
     print(f"Connected with result code: '{rc}'")
     client.subscribe([
-        (consts.TOP_PERMISSION_STATE, consts.TOPICS_QOS),
-        (consts.TOP_IR_STATE, consts.TOPICS_QOS),
-        (consts.TOP_PASSWORD, consts.TOPICS_QOS),
-        (consts.TOP_FREQUENCY, consts.TOPICS_QOS)
+        (utils.TOP_PERMISSION_STATE, utils.TOPICS_QOS),
+        (utils.TOP_IR_STATE, utils.TOPICS_QOS),
+        (utils.TOP_PASSWORD, utils.TOPICS_QOS),
+        (utils.TOP_FREQUENCY, utils.TOPICS_QOS)
     ])
 
 def onDisconnect(client, userdata, rc):
@@ -21,7 +21,7 @@ def onMessage(client, userdata, message):
     
     print(f"Time: {datetime.now()} | Topic: {topic} | Payload: {payload}")
 
-    handle_message(topic, payload)
+    handleMessage(topic, payload)
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5)
 
@@ -29,6 +29,6 @@ client.on_connect = onConnect
 client.on_disconnect = onDisconnect
 client.on_message = onMessage
 
-client.connect(consts.BROKER_URL, port=consts.BROKER_PORT)
+client.connect(utils.BROKER_URL, port=utils.BROKER_PORT)
 
 client.loop_forever()
