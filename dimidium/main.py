@@ -5,25 +5,23 @@ from datetime import datetime
 
 def onConnect(client, userdata, flags, rc, properties=None):
     print(f"Connected with result code: '{rc}'")
-    client.subscribe([
-        (utils.TOP_PERMISSION_STATE, utils.TOPICS_QOS),
-        (utils.TOP_IR_STATE, utils.TOPICS_QOS),
-        (utils.TOP_PASSWORD, utils.TOPICS_QOS),
-        (utils.TOP_FREQUENCY, utils.TOPICS_QOS)
-    ])
+    client.subscribe(utils.SUBSCRIBE)
 
 def onDisconnect(client, userdata, rc):
     print(f"Disconnected with result code: '{rc}'")
 
 def onMessage(client, userdata, message):
-    topic = message.topic
+    topic = message.topic.split('/')[0]
+    subtopic = message.topic.split('/')[1]
+    topicID = message.topic.split('/')[2]
     payload = message.payload.decode("utf-8")
     
-    print(f"Time: {datetime.now()} | Topic: {topic} | Payload: {payload}")
+    print(f"Time: {datetime.now()} | Topic: {topic} | Subtopic: {subtopic} | Topic ID: {topicID} | Payload: {payload}")
 
-    handleMessage(topic, payload)
+    if subtopic == utils.REQUEST:
+        handleMessage(client, topic, topicID, payload)
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5)
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id=utils.genID())
 
 client.on_connect = onConnect
 client.on_disconnect = onDisconnect
