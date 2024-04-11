@@ -18,6 +18,9 @@ void loop() {
     bool got_correct_password = false;
     bool is_lid_open = false;
 
+    constexpr auto LID_UPDATE_DEBOUNCE_TIME = 100;
+    uint32_t lid_update_debounce = millis();
+
     while (true) {
         if (not got_correct_password) {
             for (size_t i = 0; i < buttons.size(); ++i) {
@@ -35,7 +38,12 @@ void loop() {
             }
         }
 
-        const auto old_is_lid_open = std::exchange(is_lid_open, digitalRead(GPIO_NUM_35));
+        if (millis() - lid_update_debounce < LID_UPDATE_DEBOUNCE_TIME)
+            continue;
+
+        lid_update_debounce = millis();
+
+        const auto old_is_lid_open = std::exchange(is_lid_open, not digitalRead(GPIO_NUM_35));
         if (is_lid_open != old_is_lid_open) {
             if (is_lid_open) {
                 Serial.println("Lid opened!");
