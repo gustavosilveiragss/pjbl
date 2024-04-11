@@ -1,17 +1,28 @@
 import paho.mqtt.client as mqtt 
 import time
-import json
 import utils
 import random
 
-def readDB(key):
-    with open(utils.DB_PATH, "r") as file:
-        dbObj = json.load(file)
-        return dbObj[key]
-
 def permissionState():
-    print("Permission state")
-    init_cli()
+    print("\n------------ PERMISSION STATE ------------ ")
+    print("1. Allow")
+    print("2. Prohibit")
+    print("3. Go back")
+
+    choice = input("\nEnter your choice: ")
+
+    match choice:
+        case "1":
+            utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.WRITE, "true", callback=lambda msg: print(msg))
+            permissionState()
+        case "2":
+            utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.WRITE, "false", callback=lambda msg: print(msg))
+            permissionState()
+        case "3":
+            init_cli()
+        case _:
+            print("\nInvalid choice")
+            permissionState()
 
 def irState():
     print("\n------------ IR STATE ------------ ")
@@ -24,10 +35,10 @@ def irState():
 
     match choice:
         case "1":
-            utils.emitReq(client, utils.TOP_IR_STATE, "0")
+            utils.emitReq(client, utils.TOP_IR_STATE, utils.WRITE, "0", callback=lambda msg: print(msg))
             irState()
         case "2":
-            utils.emitReq(client, utils.TOP_IR_STATE, "1")
+            utils.emitReq(client, utils.TOP_IR_STATE, utils.WRITE, "1", callback=lambda msg: print(msg))
             irState()
         case "3":
             print("\n------------ PING TYPE ------------ ")
@@ -41,21 +52,24 @@ def irState():
             match choice:
                 case "1":
                     while True:
-                        utils.emitReq(client, utils.TOP_IR_STATE, "0")
+                        utils.emitReq(client, utils.TOP_IR_STATE, utils.WRITE, "0", callback=lambda msg: print(msg))
                         print("Waiting for 2 seconds. Press 'CTRL+C' to kill the CLI")
                         time.sleep(2)
                 case "2":
                     while True:
-                        client.publish(utils.TOP_IR_STATE, "1")
+                        utils.emitReq(client, utils.TOP_IR_STATE, utils.WRITE, "1", callback=lambda msg: print(msg))
                         print("Waiting for 2 seconds. Press 'CTRL+C' to kill the CLI")
                         time.sleep(2)
                 case "3":
                     while True:
                         s = random.choice(["0", "1"])
-                        utils.emitReq(client, utils.TOP_IR_STATE, s)
+                        utils.emitReq(client, utils.TOP_IR_STATE, utils.WRITE, s, callback=lambda msg: print(msg))
                         print("Waiting for 2 seconds. Press 'CTRL+C' to kill the CLI")
                         time.sleep(2)
                 case "4":
+                    irState()
+                case _:
+                    print("\nInvalid choice")
                     irState()
         case "4":
             init_cli()
@@ -67,22 +81,26 @@ def password():
     print("\n------------ PASSWORD ------------ ")
 
     password = input("\nEntering new password sequences:\nInput it considering:\nindex = order;\nvalue = button position\nFor example, 020 would be pressing the first button -> third -> first\n\nInput your sequence: ")
-    utils.emitReq(client, utils.TOP_PASSWORD, password)
+    utils.emitReq(client, utils.TOP_PASSWORD, utils.WRITE, password, callback=lambda msg: print(msg))
 
     init_cli()
 
 def frequency():
-    print("Frequency")
+    print("\n------------ FREQUENCY ------------ ")
+
+    frequency = input("\nInput the frequency in hertz: ")
+    utils.emitReq(client, utils.TOP_FREQUENCY, utils.WRITE, frequency, callback=lambda msg: print(msg))
+
     init_cli()
 
 def init_cli():
     print("\n------------ MQTT TESTING CLI ------------ ")
 
     print("\n------------ CURRENT DB VALUES ------------ ")
-    print(f"Permission State: {'ALLOWED' if readDB(utils.TOP_PERMISSION_STATE)['value'] == 'true' else 'PROHIBITED'}")
-    print(f"IR State: {'OPEN' if readDB(utils.TOP_IR_STATE)['value'] == '1' else 'CLOSED'}")
-    print(f"Password: {readDB(utils.TOP_PASSWORD)['value']}")
-    print(f"Frequency: {readDB(utils.TOP_FREQUENCY)['value']}")
+    utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.READ, 'trash', callback=lambda x: print(f"Permission State: {x}"))
+    utils.emitReq(client, utils.TOP_IR_STATE, utils.READ, 'trash', callback=lambda x: print(f"IR State: {x}"))
+    utils.emitReq(client, utils.TOP_PASSWORD, utils.READ, 'trash', callback=lambda x: print(f"Password: {x}"))
+    utils.emitReq(client, utils.TOP_FREQUENCY, utils.READ, 'trash', callback=lambda x: print(f"Frequency: {x}"))
 
     print("\n------------ OPTIONS ------------ ")
 

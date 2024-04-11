@@ -1,9 +1,10 @@
+from datetime import datetime
 import json
 import time
 import paho.mqtt.client as mqtt
 import os
 
-BROKER_URL = "test.mosquitto.org"
+BROKER_URL = "broker.hivemq.com"
 BROKER_PORT = 1883
 
 TOPICS_QOS = mqtt.SubscribeOptions(qos=1)
@@ -14,6 +15,8 @@ TOP_PASSWORD = "PASSWORD"
 TOP_FREQUENCY = "FREQUENCY"
 
 REQUEST = "REQ"
+READ = "R"
+WRITE = "W"
 RESPONSE = "RES"
 
 SUBSCRIBE = [
@@ -31,9 +34,8 @@ def returnError(msg):
 def genID():
     return str(os.urandom(4).hex())
 
-def emitReq(client, topic, payload, id=None):
-    if id == None:
-        id = genID()
+def emitReq(client, topic, operation, payload, callback=None):
+    id = genID()
 
     # Clear previous thread
     client.loop_stop()
@@ -55,34 +57,52 @@ def emitReq(client, topic, payload, id=None):
             return
 
         messageRaw = message.payload.decode('utf-8')
-        message = json.loads(messageRaw)
 
         client.unsubscribe(f'{topic}/{RESPONSE}/{id}')
         received = True
         client.loop_stop()
 
-        if message['status'] == 'ERROR':
-            print(f"\nReceived error response '{message['message']}' on topic ID '{id}'")
-            return
+        if operation == READ:
+            callback(messageRaw)
+            return 
         
-        print(f"\nReceived response 'OK' on topic ID '{id}'")
+        message = json.loads(messageRaw)
 
-    client.publish(f'{topic}/{REQUEST}/{id}', payload)
+        if message['status'] == 'ERROR':
+            callback(f"Received error response '{message['message']}' on topic ID '{id}'")
+            return 
+        
+        callback(f"Received response 'OK' on topic ID '{id}'")
+
+    client.publish(f'{topic}/{REQUEST}/{id}/{operation}', payload)
 
     client.on_message = onMessage
-
-    print(f"\nSent request for topic {topic}/{REQUEST}/{id}")
 
     while not received:
         if time.time() - time_start < 2:
             continue
-        print(f"\nNo response received for topic ID '{id}'")
         client.loop_stop()
-        break
+        callback(f"No response received for topic ID '{id}'")
+        return
 
-def emitRes(client, topic, payload, id=None):
-    if id == None:
-        id = genID()
+def emitRes(client, topic, payload, id):
     client.publish(f'{topic}/{RESPONSE}/{id}', payload)
 
 DB_PATH = os.path.abspath(os.path.dirname(__file__)) + "/data/db.json"
+
+def readDB(key):
+    with open(DB_PATH, "r") as file:
+        dbObj = json.load(file)
+        return dbObj[key]
+    
+def writeDB(key, payload):
+    with open(DB_PATH, "r") as file:
+        dbObj = json.load(file)
+        val = {
+            "lastChanged": str(datetime.now()),
+            "value": payload
+        }
+        dbObj[key] = val
+
+    with open(DB_PATH, "w") as file:
+        json.dump(dbObj, file)

@@ -11,15 +11,23 @@ def onDisconnect(client, userdata, rc):
     print(f"Disconnected with result code: '{rc}'")
 
 def onMessage(client, userdata, message):
-    topic = message.topic.split('/')[0]
-    subtopic = message.topic.split('/')[1]
-    topicID = message.topic.split('/')[2]
-    payload = message.payload.decode("utf-8")
-    
-    print(f"Time: {datetime.now()} | Topic: {topic} | Subtopic: {subtopic} | Topic ID: {topicID} | Payload: {payload}")
+    path = message.topic.split('/')
+
+    topic = path[0]
+    subtopic = path[1]
+    topicID = path[2]
 
     if subtopic == utils.REQUEST:
-        handleMessage(client, topic, topicID, payload)
+        operation = path[3]
+    else:
+        operation = utils.RESPONSE
+
+    payload = message.payload.decode("utf-8")
+    
+    print(f"Time: {datetime.now()} | Topic: {topic} | Subtopic: {subtopic} | Topic ID: {topicID} | Operation: {operation} | Payload: {payload}")
+
+    if subtopic == utils.REQUEST:
+        handleMessage(client, topic, topicID, operation, payload)
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id=utils.genID())
 

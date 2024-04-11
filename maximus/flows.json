@@ -1,6 +1,6 @@
 [
     {
-        "id": "932d23d37c49ad16",
+        "id": "dff6b1293fef7185",
         "type": "tab",
         "label": "Flow 1",
         "disabled": false,
@@ -8,58 +8,126 @@
         "env": []
     },
     {
-        "id": "0eef7e2cc1fde2b1",
+        "id": "191688354bf7dd39",
         "type": "mqtt in",
-        "z": "932d23d37c49ad16",
+        "z": "dff6b1293fef7185",
         "name": "",
-        "topic": "IR_STATE/READ",
+        "topic": "PERMISSION_STATE/RES/#",
         "qos": "0",
         "datatype": "auto-detect",
-        "broker": "9b90ebe4d204f04e",
+        "broker": "97095bdac394015a",
         "nl": false,
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 200,
-        "y": 220,
+        "x": 120,
+        "y": 200,
         "wires": [
             [
-                "a3ae48d73a9279a2",
-                "cb38f084067e1c49"
+                "b4c86817b31eba61"
             ]
         ]
     },
     {
-        "id": "a3ae48d73a9279a2",
-        "type": "ui_text",
-        "z": "932d23d37c49ad16",
-        "group": "9fbb6b1d50f402eb",
-        "order": 0,
-        "width": "7",
-        "height": "1",
+        "id": "6d20cbccdf7db0c7",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
         "name": "",
-        "label": "Estado da Tampa:",
-        "format": "{{msg.payload == 1 ? 'ABERTA' : 'FECHADA'}}",
-        "layout": "row-spread",
-        "className": "",
-        "style": false,
-        "font": "",
-        "fontSize": 16,
-        "color": "#000000",
-        "x": 410,
-        "y": 200,
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ERROR",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 420,
+        "y": 220,
+        "wires": [
+            [
+                "559bb13591c37442"
+            ],
+            [
+                "f3c41133f7b53884"
+            ]
+        ]
+    },
+    {
+        "id": "559bb13591c37442",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "PERMISSION_STATE/REQ/1/R",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 730,
+        "y": 180,
         "wires": []
     },
     {
-        "id": "cb38f084067e1c49",
+        "id": "f3c41133f7b53884",
+        "type": "function",
+        "z": "dff6b1293fef7185",
+        "name": "function 1",
+        "func": "return {\n    topic: msg.topic,\n    payload: msg.payload.message\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 280,
+        "wires": [
+            [
+                "19144731982d1ea0"
+            ]
+        ]
+    },
+    {
+        "id": "19144731982d1ea0",
+        "type": "ui_toast",
+        "z": "dff6b1293fef7185",
+        "position": "bottom left",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 770,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "0341eb0bbd77be4d",
         "type": "ui_text",
-        "z": "932d23d37c49ad16",
+        "z": "dff6b1293fef7185",
         "group": "9fbb6b1d50f402eb",
         "order": 0,
-        "width": "7",
-        "height": "1",
+        "width": 0,
+        "height": 0,
         "name": "",
-        "label": "Valor do Sensor Infravermelho:",
+        "label": "Allowed To Open:",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
         "className": "",
@@ -67,17 +135,687 @@
         "font": "",
         "fontSize": 16,
         "color": "#000000",
-        "x": 450,
-        "y": 160,
+        "x": 470,
+        "y": 360,
         "wires": []
     },
     {
-        "id": "9b90ebe4d204f04e",
+        "id": "b4c86817b31eba61",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 270,
+        "y": 340,
+        "wires": [
+            [
+                "6d20cbccdf7db0c7"
+            ],
+            [
+                "0341eb0bbd77be4d"
+            ]
+        ]
+    },
+    {
+        "id": "fdd1111a10340527",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ERROR",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 530,
+        "y": 480,
+        "wires": [
+            [
+                "43c929a1a0602169"
+            ],
+            [
+                "ebdebaa69ad05141"
+            ]
+        ]
+    },
+    {
+        "id": "43c929a1a0602169",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "IR_STATE/REQ/1/R",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 840,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "ebdebaa69ad05141",
+        "type": "function",
+        "z": "dff6b1293fef7185",
+        "name": "function 2",
+        "func": "return {\n    topic: msg.topic,\n    payload: msg.payload.message\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 500,
+        "wires": [
+            [
+                "c354496ede92a270"
+            ]
+        ]
+    },
+    {
+        "id": "c354496ede92a270",
+        "type": "ui_toast",
+        "z": "dff6b1293fef7185",
+        "position": "bottom left",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 900,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "5cc0854a7c9e07ed",
+        "type": "ui_text",
+        "z": "dff6b1293fef7185",
+        "group": "26b3b69c978480ca",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Lid State:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 520,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "1cfa1447352e5f37",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 330,
+        "y": 580,
+        "wires": [
+            [
+                "fdd1111a10340527"
+            ],
+            [
+                "5cc0854a7c9e07ed"
+            ]
+        ]
+    },
+    {
+        "id": "57395dbbf6fb4ee7",
+        "type": "mqtt in",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "IR_STATE/RES/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "97095bdac394015a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 140,
+        "y": 540,
+        "wires": [
+            [
+                "1cfa1447352e5f37"
+            ]
+        ]
+    },
+    {
+        "id": "3ecea06d1cea94de",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 780,
+        "wires": [
+            [
+                "e9ad182499765321"
+            ],
+            [
+                "bdea70370889a9cb"
+            ]
+        ]
+    },
+    {
+        "id": "e9ad182499765321",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ERROR",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 680,
+        "wires": [
+            [
+                "f19194aaa9bc7ed1"
+            ],
+            [
+                "b6175379788ce534"
+            ]
+        ]
+    },
+    {
+        "id": "f19194aaa9bc7ed1",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "PASSWORD/REQ/1/R",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 820,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "b6175379788ce534",
+        "type": "function",
+        "z": "dff6b1293fef7185",
+        "name": "function 3",
+        "func": "return {\n    topic: msg.topic,\n    payload: msg.payload.message\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 740,
+        "wires": [
+            [
+                "8c9c80a8817647bc"
+            ]
+        ]
+    },
+    {
+        "id": "8c9c80a8817647bc",
+        "type": "ui_toast",
+        "z": "dff6b1293fef7185",
+        "position": "bottom left",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 920,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "be35ee73e17a7ca3",
+        "type": "mqtt in",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "PASSWORD/RES/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "97095bdac394015a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 740,
+        "wires": [
+            [
+                "3ecea06d1cea94de"
+            ]
+        ]
+    },
+    {
+        "id": "98acb554949f4e5a",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 1040,
+        "wires": [
+            [
+                "0519332aaf56728a"
+            ],
+            [
+                "5a6d696a003358c8"
+            ]
+        ]
+    },
+    {
+        "id": "0519332aaf56728a",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ERROR",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 940,
+        "wires": [
+            [
+                "e4e9c60dc6870b6f"
+            ],
+            [
+                "883c047787189c87"
+            ]
+        ]
+    },
+    {
+        "id": "e4e9c60dc6870b6f",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "FREQUENCY/REQ/1/R",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 830,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "883c047787189c87",
+        "type": "function",
+        "z": "dff6b1293fef7185",
+        "name": "function 4",
+        "func": "return {\n    topic: msg.topic,\n    payload: msg.payload.message\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 1000,
+        "wires": [
+            [
+                "ec349ca4fc2b6972"
+            ]
+        ]
+    },
+    {
+        "id": "ec349ca4fc2b6972",
+        "type": "ui_toast",
+        "z": "dff6b1293fef7185",
+        "position": "bottom left",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 920,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "52b8927da7b169a0",
+        "type": "mqtt in",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "FREQUENCY/RES/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "97095bdac394015a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 140,
+        "y": 1000,
+        "wires": [
+            [
+                "98acb554949f4e5a"
+            ]
+        ]
+    },
+    {
+        "id": "bdea70370889a9cb",
+        "type": "ui_text_input",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "label": "Sequence",
+        "tooltip": "",
+        "group": "5a7eef8b2d25bc7e",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "text",
+        "delay": 300,
+        "topic": "PASSWORD/REQ/1/W",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "str",
+        "x": 500,
+        "y": 820,
+        "wires": [
+            [
+                "67eb4411672c9a95"
+            ]
+        ]
+    },
+    {
+        "id": "5a6d696a003358c8",
+        "type": "ui_text_input",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "label": "Hertz",
+        "tooltip": "",
+        "group": "4bd0ab30ffce78a8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "text",
+        "delay": 300,
+        "topic": "FREQUENCY/REQ/1/W",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "str",
+        "x": 470,
+        "y": 1080,
+        "wires": [
+            [
+                "ffc66668504ce2dc"
+            ]
+        ]
+    },
+    {
+        "id": "67eb4411672c9a95",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "PASSWORD/REQ/1/W",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 700,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "ffc66668504ce2dc",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "FREQUENCY/REQ/1/W",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 660,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "cd72e6cbeb704c21",
+        "type": "inject",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 1140,
+        "wires": [
+            [
+                "9fec5deaa68392d8",
+                "8d32de54a26a4af8",
+                "abae67a3dc1ad3ca",
+                "a8910af5137e6c4c"
+            ]
+        ]
+    },
+    {
+        "id": "9fec5deaa68392d8",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "PERMISSION_STATE/REQ/1/R",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 340,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "8d32de54a26a4af8",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "IR_STATE/REQ/1/R",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 320,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "abae67a3dc1ad3ca",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "PASSWORD/REQ/1/R",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 270,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "a8910af5137e6c4c",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "FREQUENCY/REQ/1/R",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 220,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "97095bdac394015a",
         "type": "mqtt-broker",
         "name": "",
-        "broker": "test.mosquitto.org",
+        "broker": "broker.hivemq.com",
         "port": "1883",
-        "clientid": "CAIXA",
+        "clientid": "",
         "autoConnect": true,
         "usetls": false,
         "protocolVersion": "5",
@@ -105,12 +843,45 @@
     {
         "id": "9fbb6b1d50f402eb",
         "type": "ui_group",
-        "name": "Tampa",
+        "name": "Permission State",
         "tab": "03cf4c7c4659a5ca",
         "order": 1,
         "disp": true,
-        "width": "7",
-        "collapse": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "26b3b69c978480ca",
+        "type": "ui_group",
+        "name": "Infrared State",
+        "tab": "03cf4c7c4659a5ca",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5a7eef8b2d25bc7e",
+        "type": "ui_group",
+        "name": "Password",
+        "tab": "03cf4c7c4659a5ca",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4bd0ab30ffce78a8",
+        "type": "ui_group",
+        "name": "Frequency",
+        "tab": "03cf4c7c4659a5ca",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
         "className": ""
     },
     {
