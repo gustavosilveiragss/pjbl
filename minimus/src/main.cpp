@@ -118,7 +118,7 @@ void loop() {
     uint32_t lid_update_debounce = millis();
     bool is_lid_open = digitalRead(IR_PIN);
 
-    constexpr auto DHT_READ_INTERVAL = 5000; // 30 seconds
+    constexpr auto DHT_READ_INTERVAL = 5000; // 5 seconds
     uint32_t last_dht_read = millis();
 
     while (true) {
