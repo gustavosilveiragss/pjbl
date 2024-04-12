@@ -4,13 +4,13 @@
 #include <nvs.h>
 #include <nvs_flash.h>
 #include <PubSubClient.h>
-#include <AM2302-Sensor.h>
+#include <DHT.h>
 #include <cstring>
 #include "Button.hpp"
 
-constexpr auto BUZZER_PIN = GPIO_NUM_14;
+constexpr auto BUZZER_PIN = GPIO_NUM_26;
 constexpr auto IR_PIN = GPIO_NUM_35;
-constexpr auto AM2302_PIN = GPIO_NUM_33;
+constexpr auto DHT_PIN = GPIO_NUM_14;
 
 void connect_to_wifi(const char* ssid, const char* password) {
     Serial.print("Connecting to WiFi");
@@ -28,10 +28,10 @@ void connect_to_wifi(const char* ssid, const char* password) {
 WiFiClient g_wifi_client;
 PubSubClient g_mqtt_client(g_wifi_client);
 
-std::array g_password{ 1, 0, 2 };
+std::array g_password{ 0, 0, 0 };
 int g_buzzer_frequency = 8000;
 
-AM2302::AM2302_Sensor g_am2302{ AM2302_PIN };
+DHT dht(DHT_PIN, DHT22);
 
 void setup() {
     Serial.begin(115200);
@@ -39,7 +39,7 @@ void setup() {
     pinMode(BUZZER_PIN, OUTPUT);
     pinMode(IR_PIN, INPUT_PULLUP);
 
-    connect_to_wifi("CLARO_2G97D2E8", "1297D2E8");
+    connect_to_wifi("", "");
     g_mqtt_client.setServer("broker.emqx.io", 1883);
 
     nvs_flash_init();
@@ -62,7 +62,7 @@ void setup() {
 
     nvs_close(nvs_handle);
 
-    g_am2302.begin();
+    dht.begin();
 }
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
@@ -109,7 +109,7 @@ void connect_to_mqtt_broker() {
 }
 
 void loop() {
-    std::array buttons{ Button{ GPIO_NUM_27 }, Button{ GPIO_NUM_26 }, Button{ GPIO_NUM_25 } };
+    std::array buttons{ Button{ GPIO_NUM_25 }, Button{ GPIO_NUM_33 }, Button{ GPIO_NUM_32 } };
 
     std::vector<size_t> password_attempt;
     bool got_correct_password = false;
@@ -118,8 +118,8 @@ void loop() {
     uint32_t lid_update_debounce = millis();
     bool is_lid_open = digitalRead(IR_PIN);
 
-    constexpr auto AM2302_READ_INTERVAL = 30000; // 30 seconds
-    uint32_t last_am2302_read = millis();
+    constexpr auto DHT_READ_INTERVAL = 5000; // 30 seconds
+    uint32_t last_dht_read = millis();
 
     while (true) {
         if (not g_mqtt_client.connected()) {
@@ -128,16 +128,17 @@ void loop() {
             g_mqtt_client.publish("IR_STATE/REQ/2/W", is_lid_open ? "1" : "0");
         }
 
-        if (millis() - last_am2302_read > AM2302_READ_INTERVAL) {
-            last_am2302_read = millis();
+        if (millis() - last_dht_read > DHT_READ_INTERVAL) {
+            last_dht_read = millis();
 
-            if (g_am2302.read() == AM2302::AM2302_READ_OK) {
-                const auto temp = std::to_string(g_am2302.get_Temperature());
-                const auto hum = std::to_string(g_am2302.get_Humidity());
+            const auto temp = std::to_string(dht.readTemperature());
+            Serial.printf("Temperature: %s°C\n", temp.c_str());
 
-                g_mqtt_client.publish("TEMPERATURE/REQ/2/W", temp.c_str());
-                g_mqtt_client.publish("HUMIDITY/REQ/2/W", hum.c_str());
-            }
+            const auto hum = std::to_string(dht.readHumidity());
+            Serial.printf("Humidity: %s%%\n", hum.c_str());
+
+            g_mqtt_client.publish("TEMPERATURE/REQ/2/W", temp.c_str());
+            g_mqtt_client.publish("HUMIDITY/REQ/2/W", hum.c_str());
         }
 
         if (not got_correct_password) {
