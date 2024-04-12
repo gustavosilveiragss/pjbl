@@ -122,7 +122,7 @@
         "id": "0341eb0bbd77be4d",
         "type": "ui_text",
         "z": "dff6b1293fef7185",
-        "group": "9fbb6b1d50f402eb",
+        "group": "c1f98ad485e408de",
         "order": 0,
         "width": 0,
         "height": 0,
@@ -719,7 +719,7 @@
                 "vt": "str"
             }
         ],
-        "repeat": "60",
+        "repeat": "",
         "crontab": "",
         "once": false,
         "onceDelay": "1",
@@ -727,7 +727,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 110,
-        "y": 1140,
+        "y": 1640,
         "wires": [
             [
                 "9fec5deaa68392d8",
@@ -751,8 +751,8 @@
         "correl": "",
         "expiry": "",
         "broker": "97095bdac394015a",
-        "x": 340,
-        "y": 1140,
+        "x": 350,
+        "y": 1640,
         "wires": []
     },
     {
@@ -769,8 +769,8 @@
         "correl": "",
         "expiry": "",
         "broker": "97095bdac394015a",
-        "x": 320,
-        "y": 1200,
+        "x": 330,
+        "y": 1700,
         "wires": []
     },
     {
@@ -787,8 +787,8 @@
         "correl": "",
         "expiry": "",
         "broker": "97095bdac394015a",
-        "x": 270,
-        "y": 1260,
+        "x": 280,
+        "y": 1760,
         "wires": []
     },
     {
@@ -805,15 +805,341 @@
         "correl": "",
         "expiry": "",
         "broker": "97095bdac394015a",
-        "x": 220,
-        "y": 1320,
+        "x": 230,
+        "y": 1820,
         "wires": []
+    },
+    {
+        "id": "9c5d5f413b36468f",
+        "type": "mqtt in",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "TEMPERATURE/RES/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "97095bdac394015a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 1180,
+        "wires": [
+            [
+                "57b9f23d5f3d3be8"
+            ]
+        ]
+    },
+    {
+        "id": "b4f125094fb61fc1",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ERROR",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 440,
+        "y": 1200,
+        "wires": [
+            [
+                "da152728068a2c54"
+            ],
+            [
+                "df2edb765e69fc9e"
+            ]
+        ]
+    },
+    {
+        "id": "da152728068a2c54",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "TEMPERATURE/REQ/1/R",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 740,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "df2edb765e69fc9e",
+        "type": "function",
+        "z": "dff6b1293fef7185",
+        "name": "function 5",
+        "func": "return {\n    topic: msg.topic,\n    payload: msg.payload.message\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 1260,
+        "wires": [
+            [
+                "3bea45138a690c80"
+            ]
+        ]
+    },
+    {
+        "id": "3bea45138a690c80",
+        "type": "ui_toast",
+        "z": "dff6b1293fef7185",
+        "position": "bottom left",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 790,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "c262d6fac7c92979",
+        "type": "ui_text",
+        "z": "dff6b1293fef7185",
+        "group": "9fbb6b1d50f402eb",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperature:",
+        "format": "{{msg.payload}}ºC",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 470,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "57b9f23d5f3d3be8",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 290,
+        "y": 1320,
+        "wires": [
+            [
+                "b4f125094fb61fc1"
+            ],
+            [
+                "c262d6fac7c92979"
+            ]
+        ]
+    },
+    {
+        "id": "61d9cbb4a2f292be",
+        "type": "mqtt in",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "HUMIDITY/RES/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "97095bdac394015a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 1400,
+        "wires": [
+            [
+                "3fb10fba76470243"
+            ]
+        ]
+    },
+    {
+        "id": "89d770f762e87110",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ERROR",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 440,
+        "y": 1420,
+        "wires": [
+            [
+                "66b4c5eee7bf4e4c"
+            ],
+            [
+                "badcebf735a10fd7"
+            ]
+        ]
+    },
+    {
+        "id": "66b4c5eee7bf4e4c",
+        "type": "mqtt out",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "topic": "HUMIDITY/REQ/1/R",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "97095bdac394015a",
+        "x": 720,
+        "y": 1380,
+        "wires": []
+    },
+    {
+        "id": "badcebf735a10fd7",
+        "type": "function",
+        "z": "dff6b1293fef7185",
+        "name": "function 6",
+        "func": "return {\n    topic: msg.topic,\n    payload: msg.payload.message\n};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 1480,
+        "wires": [
+            [
+                "a74e625fd0ed87d7"
+            ]
+        ]
+    },
+    {
+        "id": "a74e625fd0ed87d7",
+        "type": "ui_toast",
+        "z": "dff6b1293fef7185",
+        "position": "bottom left",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 790,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "51a086555f9c3725",
+        "type": "ui_text",
+        "z": "dff6b1293fef7185",
+        "group": "9fbb6b1d50f402eb",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Humidity:",
+        "format": "{{msg.payload}}%",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 460,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "3fb10fba76470243",
+        "type": "switch",
+        "z": "dff6b1293fef7185",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 290,
+        "y": 1540,
+        "wires": [
+            [
+                "89d770f762e87110"
+            ],
+            [
+                "51a086555f9c3725"
+            ]
+        ]
     },
     {
         "id": "97095bdac394015a",
         "type": "mqtt-broker",
         "name": "",
-        "broker": "broker.hivemq.com",
+        "broker": "broker.emqx.io",
         "port": "1883",
         "clientid": "",
         "autoConnect": true,
@@ -841,13 +1167,13 @@
         "sessionExpiry": ""
     },
     {
-        "id": "9fbb6b1d50f402eb",
+        "id": "c1f98ad485e408de",
         "type": "ui_group",
         "name": "Permission State",
         "tab": "03cf4c7c4659a5ca",
-        "order": 1,
+        "order": 5,
         "disp": true,
-        "width": "10",
+        "width": "6",
         "collapse": false,
         "className": ""
     },
@@ -881,6 +1207,17 @@
         "order": 4,
         "disp": true,
         "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9fbb6b1d50f402eb",
+        "type": "ui_group",
+        "name": "DHT22",
+        "tab": "03cf4c7c4659a5ca",
+        "order": 1,
+        "disp": true,
+        "width": "10",
         "collapse": false,
         "className": ""
     },
