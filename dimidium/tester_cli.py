@@ -93,14 +93,32 @@ def frequency():
 
     init_cli()
 
+def temperature():
+    print("\n------------ TEMPERATURE ------------ ")
+
+    temperature = input("\nInput the temperature in celsius: ")
+    utils.emitReq(client, utils.TOP_TEMPERATURE, utils.WRITE, temperature, callback=lambda msg: print(msg))
+
+    init_cli()
+
+def humidity():
+    print("\n------------ HUMIDITY ------------ ")
+
+    humidity = input("\nInput the humidity in percentage: ")
+    utils.emitReq(client, utils.TOP_HUMIDITY, utils.WRITE, humidity, callback=lambda msg: print(msg))
+
+    init_cli()
+
 def init_cli():
     print("\n------------ MQTT TESTING CLI ------------ ")
 
     print("\n------------ CURRENT DB VALUES ------------ ")
-    utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.READ, 'trash', callback=lambda x: print(f"Permission State: {x}"))
-    utils.emitReq(client, utils.TOP_IR_STATE, utils.READ, 'trash', callback=lambda x: print(f"IR State: {x}"))
-    utils.emitReq(client, utils.TOP_PASSWORD, utils.READ, 'trash', callback=lambda x: print(f"Password: {x}"))
-    utils.emitReq(client, utils.TOP_FREQUENCY, utils.READ, 'trash', callback=lambda x: print(f"Frequency: {x}"))
+    utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.READ, '0', callback=lambda x: print(f"Permission State: {x}"))
+    utils.emitReq(client, utils.TOP_IR_STATE, utils.READ, '0', callback=lambda x: print(f"IR State: {x}"))
+    utils.emitReq(client, utils.TOP_PASSWORD, utils.READ, '0', callback=lambda x: print(f"Password: {x}"))
+    utils.emitReq(client, utils.TOP_FREQUENCY, utils.READ, '0', callback=lambda x: print(f"Frequency: {x}"))
+    utils.emitReq(client, utils.TOP_TEMPERATURE, utils.READ, '0', callback=lambda x: print(f"Temperature: {x}"))
+    utils.emitReq(client, utils.TOP_HUMIDITY, utils.READ, '0', callback=lambda x: print(f"Humidity: {x}"))
 
     print("\n------------ OPTIONS ------------ ")
 
@@ -108,7 +126,9 @@ def init_cli():
     print("2. IR State")
     print("3. Password")
     print("4. Frequency")
-    print("5. Exit")
+    print("5. Temp")
+    print("6. Humidity")
+    print("7. Exit")
 
     choice = input("\nEnter your choice: ")
     
@@ -122,6 +142,10 @@ def init_cli():
         case "4":
             frequency()
         case "5":
+            temperature()
+        case "6":
+            humidity()
+        case "7":
             exit()
         case _:
             print("\nInvalid choice")

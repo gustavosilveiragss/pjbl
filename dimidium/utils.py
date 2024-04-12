@@ -4,7 +4,7 @@ import time
 import paho.mqtt.client as mqtt
 import os
 
-BROKER_URL = "broker.hivemq.com"
+BROKER_URL = "broker.emqx.io"
 BROKER_PORT = 1883
 
 TOPICS_QOS = mqtt.SubscribeOptions(qos=1)
@@ -13,6 +13,8 @@ TOP_PERMISSION_STATE = "PERMISSION_STATE"
 TOP_IR_STATE = "IR_STATE"
 TOP_PASSWORD = "PASSWORD"
 TOP_FREQUENCY = "FREQUENCY"
+TOP_TEMPERATURE = "TEMPERATURE"
+TOP_HUMIDITY = "HUMIDITY"
 
 REQUEST = "REQ"
 READ = "R"
@@ -24,6 +26,8 @@ SUBSCRIBE = [
     (TOP_IR_STATE + '/#', TOPICS_QOS),
     (TOP_PASSWORD + '/#', TOPICS_QOS),
     (TOP_FREQUENCY + '/#', TOPICS_QOS),
+    (TOP_TEMPERATURE + '/#', TOPICS_QOS),
+    (TOP_HUMIDITY + '/#', TOPICS_QOS)
 ]
 
 RESPONSE_OK = '{"status": "OK"}'

@@ -55,6 +55,42 @@ def handleFrequency(client, payload, operation, topicID):
     utils.writeDB(utils.TOP_FREQUENCY, payload)
     utils.emitRes(client, utils.TOP_FREQUENCY, utils.RESPONSE_OK, topicID)
 
+def handleTemperature(client, payload, operation, topicID):
+    if operation == utils.READ:
+        utils.emitRes(client, utils.TOP_TEMPERATURE, utils.readDB(utils.TOP_TEMPERATURE)['value'], topicID)
+        return
+    
+    def validateTemperature():
+        try:
+            return float(payload) >= 0 and float(payload) <= 100
+        except ValueError:
+            return False
+    
+    if not validateTemperature():
+        utils.emitRes(client, utils.TOP_TEMPERATURE, utils.returnError("Temperature must be a number between 0.0 and 100.0, indicating the degrees celsius"), topicID)
+        return
+    
+    utils.writeDB(utils.TOP_TEMPERATURE, payload)
+    utils.emitRes(client, utils.TOP_TEMPERATURE, utils.RESPONSE_OK, topicID)
+
+def handleHumidity(client, payload, operation, topicID):
+    if operation == utils.READ:
+        utils.emitRes(client, utils.TOP_HUMIDITY, utils.readDB(utils.TOP_HUMIDITY)['value'], topicID)
+        return
+    
+    def validateHumidity():
+        try:
+            return float(payload) >= 0 and float(payload) <= 100
+        except ValueError:
+            return False
+    
+    if not validateHumidity():
+        utils.emitRes(client, utils.TOP_HUMIDITY, utils.returnError("Humidity must be a number between 0.0 and 100.0, indicating the humidity percentage"), topicID)
+        return
+    
+    utils.writeDB(utils.TOP_HUMIDITY, payload)
+    utils.emitRes(client, utils.TOP_HUMIDITY, utils.RESPONSE_OK, topicID)
+
 def handleMessage(client, topic, topicID, operation, payload):
     match topic:
         case utils.TOP_PERMISSION_STATE:
@@ -68,6 +104,12 @@ def handleMessage(client, topic, topicID, operation, payload):
             return
         case utils.TOP_FREQUENCY:
             handleFrequency(client, payload, operation, topicID)
+            return
+        case utils.TOP_TEMPERATURE:
+            handleTemperature(client, payload, operation, topicID)
+            return
+        case utils.TOP_HUMIDITY:
+            handleHumidity(client, payload, operation, topicID)
             return
         case _:
             print("Unknown topic")
