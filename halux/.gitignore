@@ -2,4 +2,7 @@
 instance/
 .webassets-cache
 
+**/__pycache__
+.vscode/
+
 .venv/
