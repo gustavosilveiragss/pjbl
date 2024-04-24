@@ -1,0 +1,21 @@
+
+
+<table>
+    <thead>
+        <th>
+            <td>id</td>
+            <td>Horario</td>
+            <td>Mensagem</td>
+        </th>
+    </thead>
+    <tbody>
+        {% for r in reads %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.date_time }}</td>
+            <td>{{ r.message }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
