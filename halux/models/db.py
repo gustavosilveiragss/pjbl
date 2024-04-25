@@ -1,0 +1,2 @@
+def readDB(key):
+    return ""
