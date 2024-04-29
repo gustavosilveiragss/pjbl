@@ -3,7 +3,7 @@ ADDRESS = '127.0.0.1'
 PORT = 5000
 
 # MQTT
-BROKER_URL = "broker.hivemq.com"
+BROKER_URL = "broker.emqx.io"
 BROKER_PORT = 1883
 BROKER_KEEPALIVE = 60
 BROKER_TLS_ENABLED = False

@@ -1,5 +1,6 @@
 import utils.consts as consts
 from flask_mqtt import Mqtt
+from models.db import db
 
 mqtt_client = Mqtt()
 
@@ -20,7 +21,7 @@ def emitRes(topic, payload, id):
 
 def handlePermissionState(client, payload, operation, topicID):
     if operation == consts.READ:
-        res = "ALLOWED" if consts.readDB(consts.TOP_PERMISSION_STATE)['value'] == "true" else "PROHIBITED"
+        res = "ALLOWED" if db.readDB(consts.TOP_PERMISSION_STATE)['value'] == "true" else "PROHIBITED"
         emitRes(consts.TOP_PERMISSION_STATE, res, topicID)
         return
     
@@ -33,7 +34,7 @@ def handlePermissionState(client, payload, operation, topicID):
 
 def handleIRState(client, payload, operation, topicID):
     if operation == consts.READ:
-        res = "OPEN" if consts.readDB(consts.TOP_IR_STATE)['value'] == "1" else "CLOSED"
+        res = "OPEN" if db.readDB(consts.TOP_IR_STATE)['value'] == "1" else "CLOSED"
         emitRes(consts.TOP_IR_STATE, res, topicID)
         return
     
@@ -46,7 +47,7 @@ def handleIRState(client, payload, operation, topicID):
 
 def handlePassword(client, payload, operation, topicID):
     if operation == consts.READ:
-        emitRes(consts.TOP_PASSWORD, consts.readDB(consts.TOP_PASSWORD)['value'], topicID)
+        emitRes(consts.TOP_PASSWORD, db.readDB(consts.TOP_PASSWORD)['value'], topicID)
         return
     
     if len(payload) != 3:
@@ -63,7 +64,7 @@ def handlePassword(client, payload, operation, topicID):
 
 def handleFrequency(client, payload, operation, topicID):
     if operation == consts.READ:
-        emitRes(consts.TOP_FREQUENCY, consts.readDB(consts.TOP_FREQUENCY)['value'], topicID)
+        emitRes(consts.TOP_FREQUENCY, db.readDB(consts.TOP_FREQUENCY)['value'], topicID)
         return
     
     if not payload.isdigit() or int(payload) < 0 or int(payload) > 10000:
@@ -75,7 +76,7 @@ def handleFrequency(client, payload, operation, topicID):
 
 def handleTemperature(client, payload, operation, topicID):
     if operation == consts.READ:
-        emitRes(consts.TOP_TEMPERATURE, consts.readDB(consts.TOP_TEMPERATURE)['value'], topicID)
+        emitRes(consts.TOP_TEMPERATURE, db.readDB(consts.TOP_TEMPERATURE)['value'], topicID)
         return
     
     def validateTemperature():
@@ -93,7 +94,7 @@ def handleTemperature(client, payload, operation, topicID):
 
 def handleHumidity(client, payload, operation, topicID):
     if operation == consts.READ:
-        emitRes(consts.TOP_HUMIDITY, consts.readDB(consts.TOP_HUMIDITY)['value'], topicID)
+        emitRes(consts.TOP_HUMIDITY, db.readDB(consts.TOP_HUMIDITY)['value'], topicID)
         return
     
     def validateHumidity():

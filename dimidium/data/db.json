@@ -1,1 +1,26 @@
-{"PASSWORD": {"lastChanged": "2024-04-12 19:19:18.344520", "value": "000"}, "FREQUENCY": {"lastChanged": "2024-04-12 19:19:43.827349", "value": "8000"}, "PERMISSION_STATE": {"lastChanged": "2024-04-12 19:17:35.437779", "value": "false"}, "IR_STATE": {"lastChanged": "2024-04-12 19:18:19.543647", "value": "1"}, "TEMPERATURE": {"lastChanged": "2024-04-12 19:20:09.159212", "value": "80"}, "HUMIDITY": {"lastChanged": "2024-04-12 19:20:20.080172", "value": "100"}}
+{
+    "PASSWORD": {
+        "lastChanged": "2024-04-12 19:19:18.344520",
+        "value": "000"
+    },
+    "FREQUENCY": {
+        "lastChanged": "2024-04-12 19:19:43.827349",
+        "value": "8000"
+    },
+    "PERMISSION_STATE": {
+        "lastChanged": "2024-04-12 19:17:35.437779",
+        "value": "false"
+    },
+    "IR_STATE": {
+        "lastChanged": "2024-04-12 19:18:19.543647",
+        "value": "1"
+    },
+    "TEMPERATURE": {
+        "lastChanged": "2024-04-12 19:20:09.159212",
+        "value": "80"
+    },
+    "HUMIDITY": {
+        "lastChanged": "2024-04-12 19:20:20.080172",
+        "value": "100"
+    }
+}

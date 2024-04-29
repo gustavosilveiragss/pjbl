@@ -2,8 +2,8 @@ Uma aplicação Web com as seguintes funções:
     Tela de login com validação de usuário;
     Tela de cadastro de usuários (somente para usuário Admin);
     Tela de edição e remoção de usuários (somente para usuário Admin);
+
     Tela para cadastro de sensores e atuadores (somente para usuário Admin);
-    Tela para edição e remoção de usuários (somente para usuário Admin);
     Tela para visualização dos dados em Tempo Real (todos usuários tem acesso) coletados via MQTT Flask oriundos de uma aplicação do RA1, sendo por sistema físico (ESP32 por exemplo) ou via Wokwi;
     Tela para comandos remotos (todos usuários tem acesso) utilizando Flask mqtt para publicar na aplicação em ESP32 ou Wokwi;
 
