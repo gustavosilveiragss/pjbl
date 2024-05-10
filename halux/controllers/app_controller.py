@@ -4,7 +4,7 @@ from datetime import datetime
 from controllers.iot_controller import iot
 from models.db import instance, db
 from models.mqtt import mqtt_client, topics_subscribe, handleMessage
-from flask_socketio import SocketIO, emit
+from models.fake_db import *
 
 
 def create_app() -> Flask:
@@ -16,8 +16,6 @@ def create_app() -> Flask:
     )
 
     app.register_blueprint(iot, url_prefix="/iot")
-
-    socketio = SocketIO(app, cors_allowed_origins="*")
 
     app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
     app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
@@ -54,15 +52,6 @@ def create_app() -> Flask:
 
         payload = message.payload.decode("utf-8")
 
-        log = {
-            "timestamp": datetime.now(),
-            "topic": topic,
-            "subtopic": subtopic,
-            "id": topicID,
-            "operation": operation,
-            "payload": payload,
-        }
-
         print(
             f"Time: {datetime.now()} | Topic: {topic} | Subtopic: {subtopic} | Topic ID: {topicID} | Operation: {operation} | Payload: {payload}"
         )
@@ -87,4 +76,4 @@ def create_app() -> Flask:
     def logs():
         return render_template("logs.jinja", data=data_maestro)
 
-    return socketio, app
+    return app
