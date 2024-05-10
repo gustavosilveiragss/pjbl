@@ -28,6 +28,10 @@ def create_app() -> Flask:
     mqtt_client.init_app(app)
     db.init_app(app)
 
+    data_maestro = dict(
+        active_page = "dashboard"
+    )
+
     @mqtt_client.on_connect()
     def handle_connect(client, userdata, flags, rc):
         if rc == 0:
@@ -70,7 +74,7 @@ def create_app() -> Flask:
 
     @app.route("/")
     def index():
-        return render_template("app.html")
+        return render_template("app.jinja", data=data_maestro)
 
     @app.route("/publish", methods=["POST"])
     def publish_message():
@@ -83,6 +87,6 @@ def create_app() -> Flask:
 
     @app.route("/logs")
     def logs():
-        return render_template("logs.html")
+        return render_template("logs.jinja", data=data_maestro)
 
     return socketio, app

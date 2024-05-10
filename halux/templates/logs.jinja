@@ -1,0 +1,24 @@
+{% extends "base.jinja" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<table>
+    <tr>
+        <th>Timestamp</th>
+        <th>Topic</th>
+        <th>Subtopic</th>
+        <th>ID</th>
+        <th>Operation</th>
+        <th>Payload</th>
+    </tr>
+    {% for log in data %}
+    <tr>
+        <td>{{ log.timestamp }}</td>
+        <td>{{ log.topic }}</td>
+        <td>{{ log.subtopic }}</td>
+        <td>{{ log.id }}</td>
+        <td>{{ log.operation }}</td>
+        <td>{{ log.payload }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
