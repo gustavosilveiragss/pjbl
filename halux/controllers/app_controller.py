@@ -28,9 +28,7 @@ def create_app() -> Flask:
     mqtt_client.init_app(app)
     db.init_app(app)
 
-    data_maestro = dict(
-        active_page = "dashboard"
-    )
+    data_maestro = dict(active_page="dashboard")
 
     @mqtt_client.on_connect()
     def handle_connect(client, userdata, flags, rc):
