@@ -1,0 +1,51 @@
+{% extends "base.jinja" %}
+{% block title %}Devices{% endblock %}
+{% block content %}
+<form>
+    <a href='/devices/new' class='max-width-btn'>Add Device</a>
+</form>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Created At</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    {% for d in data.devices %}
+    <tr>
+        <td>{{ d.device_id }}</td>
+        <td>{{ d.created_at }}</td>
+        <td>{{ d.device_name }}</td>
+        <td>
+            <a href="/devices/{{ d.device_id }}" class="action-button edit-button">
+                <i class="fa fa-pencil"></i>
+            </a>
+            <button onclick="deleteDevice({{ d.device_id }})" class="action-button delete-button">
+                <i class="fa fa-times"></i>
+            </button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<script>
+    function deleteDevice(device_id) {
+        fetch('/delete_device', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                device_id
+            })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('An error occurred while deleting the device');
+            }
+        });
+    }
+</script>
+{% endblock %}

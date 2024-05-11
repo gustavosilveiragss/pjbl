@@ -64,28 +64,137 @@ def create_app() -> Flask:
 
         mqtt_logs.append(log)
 
-        print(
-            f"Time: {datetime.now()} | Topic: {topic} | Subtopic: {subtopic} | Topic ID: {topicID} | Operation: {operation} | Payload: {payload}"
-        )
-
         if subtopic == consts.REQUEST:
             handleMessage(client, topic, topicID, operation, payload)
 
     @app.route("/")
     def index():
+        data_maestro["active_page"] = "dashboard"
         return render_template("app.jinja", data=data_maestro)
 
     @app.route("/publish", methods=["POST"])
     def publish_message():
         request_data = request.get_json()
-        print(request_data)
-
         result, _ = mqtt_client.publish(request_data["topic"], request_data["message"])
-
         return jsonify(result)
 
     @app.route("/logs")
     def logs():
-        return render_template("logs.jinja", data=data_maestro, logs=reversed(mqtt_logs))
+        data_maestro["active_page"] = "logs"
+        data_maestro["logs"] = reversed(mqtt_logs)
+        return render_template("logs.jinja", data=data_maestro)
+
+    @app.route("/devices")
+    def devices_route():
+        data_maestro["active_page"] = "devices"
+        data_maestro["devices"] = device
+        return render_template("devices.jinja", data=data_maestro)
+
+    @app.route("/devices/<int:device_id>")
+    def device_route(device_id):
+        data_maestro["active_page"] = "devices"
+
+        # Proper query with the joins will be implmeented once the database gets created
+        d = None
+        for d_db in device:
+            if d_db["device_id"] == device_id:
+                d = d_db
+                break
+        if d is None:
+            data_maestro["devices"] = device
+            return render_template("devices.jinja", data=data_maestro)
+
+        data_maestro["device"] = d
+        data_maestro["sensors"] = []
+        data_maestro["actuators"] = []
+
+        for d_s in device_sensor:
+            if d_s["device_id"] == device_id:
+                sensor = dict(sensor_id=d_s["sensor_model_id"])
+                for s in sensor_model:
+                    if s["sensor_model_id"] == d_s["sensor_model_id"]:
+                        sensor["name"] = s["name"]
+                        break
+                data_maestro["sensors"].append(sensor)
+        for d_a in device_actuator:
+            if d_a["device_id"] == device_id:
+                actuator = dict(actuator_id=d_a["actuator_model_id"])
+                for a in actuator_model:
+                    if a["actuator_model_id"] == d_a["actuator_model_id"]:
+                        actuator["name"] = a["name"]
+                        break
+                data_maestro["actuators"].append(actuator)
+
+        return render_template("edit_device.jinja", data=data_maestro)
+
+    @app.route("/edit_device", methods=["PUT"])
+    def edit_device():
+        request_data = request.get_json()
+        device_id = request_data["device_id"]
+        device_name = request_data["name"]
+
+        d = None
+        for d_db in device:
+            if d_db["device_id"] == device_id:
+                d = d_db
+                break
+        if d is None:
+            return jsonify({"status": "Device not found"}), 400
+
+        d["device_name"] = device_name
+
+        return jsonify({"status": "OK"})
+
+    @app.route("/delete_device", methods=["DELETE"])
+    def delete_device():
+        request_data = request.get_json()
+        device_id = request_data["device_id"]
+
+        d = None
+        for d_db in device:
+            if d_db["device_id"] == device_id:
+                d = d_db
+                break
+        if d is None:
+            return jsonify({"status": "Device not found"}), 400
+
+        device.remove(d)
+
+        return jsonify({"status": "OK"})
+
+    @app.route("/devices/new")
+    def new_device():
+        data_maestro["active_page"] = "devices"
+        data_maestro["sensors"] = sensor_model
+        data_maestro["actuators"] = actuator_model
+        return render_template("new_device.jinja", data=data_maestro)
+
+    @app.route("/new_device", methods=["POST"])
+    def create_device():
+        request_data = request.get_json()
+        device_name = request_data["name"]
+
+        device_id = len(device) + 1
+        device.append(
+            dict(device_id=device_id, device_name=device_name, created_at=datetime.now())
+        )
+
+        for s in sensor_model:
+            device_sensor.append(
+                dict(
+                    device_id=device_id,
+                    sensor_model_id=s["sensor_model_id"],
+                )
+            )
+
+        for a in actuator_model:
+            device_actuator.append(
+                dict(
+                    device_id=device_id,
+                    actuator_model_id=a["actuator_model_id"],
+                )
+            )
+
+        return jsonify({"status": "OK"})
 
     return app

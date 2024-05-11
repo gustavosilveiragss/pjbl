@@ -8,6 +8,7 @@ body {
 .navbar {
     background-color: #333;
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 .navbar a {
@@ -73,7 +74,8 @@ table {
     width: 80%
 }
 
-th, td {
+th,
+td {
     text-align: center;
     padding: 8px;
 }
@@ -85,4 +87,69 @@ tr:nth-child(even) {
 th {
     background-color: #4CAF50;
     color: white;
+}
+
+.table-title {
+    text-align: center;
+    font-weight: bold;
+    width: auto;
+}
+
+/* BUTTONS */
+
+.action-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1.2em;
+}
+
+.edit-button {
+    color: #4CAF50;
+}
+
+.delete-button {
+    color: #F44336;
+}
+
+/* FORMS */
+
+form {
+    margin: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+form input[type=text],
+form input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+form input[type=submit],
+form button,
+.max-width-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    font-size: large;
+    display: flex;
+    text-decoration: none;
+    text-align: center;
+    justify-content: center;
+}
+
+.max-width-btn {
+    width: auto !important;
 }

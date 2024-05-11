@@ -1,0 +1,60 @@
+{% extends "base.jinja" %}
+{% block title %}{{ data.device.device_name }}{% endblock %}
+{% block content %}
+<form id="edit-form">
+    <label for="name">Device Name:</label>
+    <input type="text" id="name" name="name" value='{{ data.device.device_name }}'>
+    <input type="submit" value="Submit">
+</form>
+
+{% if data.sensors|length > 0 %}
+<table>
+    <h3 class='table-title'>Sensors</h3>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    {% for s in data.sensors %}
+    <tr>
+        <td>{{ s.sensor_id }}</td>
+        <td>{{ s.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if data.actuators|length > 0 %}
+<table>
+    <h3 class='table-title'>Actuators</h3>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    {% for a in data.actuators %}
+    <tr>
+        <td>{{ a.actuator_id }}</td>
+        <td>{{ a.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<script>
+    document.getElementById('edit-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+
+        fetch('/edit_device', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                device_id: {{ data.device.device_id }},
+                name,
+            }),
+        }).then(response => alert(response.ok ? 'Device updated' : 'Error updating device'));
+    });
+</script>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.jinja" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Logs{% endblock %}
 {% block content %}
 <table>
     <tr>
@@ -10,12 +10,12 @@
         <th>Operation</th>
         <th>Payload</th>
     </tr>
-    {% for log in logs %}
+    {% for log in data.logs %}
     <tr>
-        <td>{{ log.timestamp }}</td>
+        <td>{{ log.created_at }}</td>
         <td>{{ log.topic }}</td>
         <td>{{ log.subtopic }}</td>
-        <td>{{ log.id }}</td>
+        <td>{{ log.device_id }}</td>
         <td>{{ log.operation }}</td>
         <td>{{ log.payload }}</td>
     </tr>
