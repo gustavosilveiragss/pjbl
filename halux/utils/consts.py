@@ -19,3 +19,5 @@ REQUEST = "REQ"
 READ = "R"
 WRITE = "W"
 RESPONSE = "RES"
+
+RESPONSE_OK = '{"status": "OK"}'

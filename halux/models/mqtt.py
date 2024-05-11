@@ -18,7 +18,7 @@ def returnError(msg):
     return '{"status": "ERROR", "message": "' + msg + '"}'
 
 def emitRes(topic, payload, id):
-    mqtt_client.publish(f'{topic}/{consts.RESPONSE}/{id}', payload)
+    mqtt_client.publish(f'{topic}/{consts.RESPONSE}/{id}', payload, 1)
 
 def handlePermissionState(client, payload, operation, topicID):
     if operation == consts.READ:
@@ -38,7 +38,6 @@ def handlePermissionState(client, payload, operation, topicID):
 def handleIRState(client, payload, operation, topicID):
     d_val = None
     for d in device_sensor:
-        print(d)
         if d["device_id"] == int(topicID) and d["sensor_model_id"] == 3:
             d_val = d
             break
@@ -81,7 +80,6 @@ def handlePassword(client, payload, operation, topicID):
 def handleFrequency(client, payload, operation, topicID):
     d_val = None
     for d in device_actuator:
-        print(d, topicID)
         if d["device_id"] == int(topicID) and d["actuator_model_id"] == 2:
             d_val = d
             break

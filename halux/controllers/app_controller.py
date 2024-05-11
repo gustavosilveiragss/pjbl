@@ -33,7 +33,7 @@ def create_app() -> Flask:
         if rc == 0:
             print("Connected successfully")
             for topic in topics_subscribe:
-                mqtt_client.subscribe(topic)
+                mqtt_client.subscribe(topic, 1)
         else:
             print("Bad connection. Code:", rc)
 
@@ -86,6 +86,6 @@ def create_app() -> Flask:
 
     @app.route("/logs")
     def logs():
-        return render_template("logs.jinja", data=data_maestro)
+        return render_template("logs.jinja", data=data_maestro, logs=reversed(mqtt_logs))
 
     return app

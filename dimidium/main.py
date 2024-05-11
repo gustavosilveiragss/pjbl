@@ -29,7 +29,7 @@ def onMessage(client, userdata, message):
     if subtopic == utils.REQUEST:
         handleMessage(client, topic, topicID, operation, payload)
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id=utils.genID())
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id="0")
 
 client.on_connect = onConnect
 client.on_disconnect = onDisconnect

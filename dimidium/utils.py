@@ -35,11 +35,8 @@ RESPONSE_OK = '{"status": "OK"}'
 def returnError(msg):
     return '{"status": "ERROR", "message": "' + msg + '"}'
 
-def genID():
-    return str(2)
-
 def emitReq(client, topic, operation, payload, callback=None):
-    id = genID()
+    id = "2"
 
     # Clear previous thread
     client.loop_stop()

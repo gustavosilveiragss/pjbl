@@ -152,7 +152,7 @@ def init_cli():
             init_cli()
             return
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id=utils.genID())
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id="2")
 
 client.connect(utils.BROKER_URL, port=utils.BROKER_PORT)
 
