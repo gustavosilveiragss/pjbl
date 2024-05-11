@@ -1,6 +1,7 @@
 import utils.consts as consts
 from flask_mqtt import Mqtt
 from models.db import db
+from models.fake_db import *
 
 mqtt_client = Mqtt()
 
@@ -21,20 +22,32 @@ def emitRes(topic, payload, id):
 
 def handlePermissionState(client, payload, operation, topicID):
     if operation == consts.READ:
-        res = "ALLOWED" if db.readDB(consts.TOP_PERMISSION_STATE)['value'] == "true" else "PROHIBITED"
+        # res = "ALLOWED" if db.readDB(consts.TOP_PERMISSION_STATE)['value'] == "true" else "PROHIBITED"
+        res = "ALLOWED" if device[int(topicID) - 1]["permission_state"] == 1 else "PROHIBITED"
         emitRes(consts.TOP_PERMISSION_STATE, res, topicID)
         return
     
-    if payload != "true" and payload != "false":
-        emitRes(consts.TOP_PERMISSION_STATE, returnError("Permission state must be either 'true' or 'false'"), topicID)
+    if payload != "0" and payload != "1":
+        emitRes(consts.TOP_PERMISSION_STATE, returnError("Permission state must be either '0' or '1'"), topicID)
         return
 
-    consts.writeDB(consts.TOP_PERMISSION_STATE, payload)
+    # consts.writeDB(consts.TOP_PERMISSION_STATE, payload)
+    device[int(topicID) - 1]["permission_state"] = int(payload)
     emitRes(consts.TOP_PERMISSION_STATE, consts.RESPONSE_OK, topicID)
 
 def handleIRState(client, payload, operation, topicID):
+    d_val = None
+    for d in device_sensor:
+        print(d)
+        if d["device_id"] == int(topicID) and d["sensor_model_id"] == 3:
+            d_val = d
+            break
+    if d_val is None:
+        return
+    
     if operation == consts.READ:
-        res = "OPEN" if db.readDB(consts.TOP_IR_STATE)['value'] == "1" else "CLOSED"
+        # res = "OPEN" if db.readDB(consts.TOP_IR_STATE)['value'] == "1" else "CLOSED"
+        res = "OPEN" if d_val["value"] == 1 else "CLOSED"
         emitRes(consts.TOP_IR_STATE, res, topicID)
         return
     
@@ -42,12 +55,14 @@ def handleIRState(client, payload, operation, topicID):
         emitRes(consts.TOP_IR_STATE, returnError("IR state must be either '0' or '1'"), topicID)
         return
 
-    consts.writeDB(consts.TOP_IR_STATE, payload)
+    # consts.writeDB(consts.TOP_IR_STATE, payload)
+    d_val["value"] = int(payload)
     emitRes(consts.TOP_IR_STATE, consts.RESPONSE_OK, topicID)
 
 def handlePassword(client, payload, operation, topicID):
     if operation == consts.READ:
-        emitRes(consts.TOP_PASSWORD, db.readDB(consts.TOP_PASSWORD)['value'], topicID)
+        # emitRes(consts.TOP_PASSWORD, db.readDB(consts.TOP_PASSWORD)['value'], topicID)
+        emitRes(consts.TOP_PASSWORD, device[int(topicID) - 1]["password"], topicID)
         return
     
     if len(payload) != 3:
@@ -59,24 +74,45 @@ def handlePassword(client, payload, operation, topicID):
             emitRes(consts.TOP_PASSWORD, returnError("Password sequence must contain only numbers between 0 and 2"), topicID)
             return
 
-    consts.writeDB(consts.TOP_PASSWORD, payload)
+    # consts.writeDB(consts.TOP_PASSWORD, payload)
+    device[int(topicID) - 1]["password"] = payload
     emitRes(consts.TOP_PASSWORD, consts.RESPONSE_OK, topicID)
 
 def handleFrequency(client, payload, operation, topicID):
+    d_val = None
+    for d in device_actuator:
+        print(d, topicID)
+        if d["device_id"] == int(topicID) and d["actuator_model_id"] == 2:
+            d_val = d
+            break
+    if d_val is None:
+        return
+    
     if operation == consts.READ:
-        emitRes(consts.TOP_FREQUENCY, db.readDB(consts.TOP_FREQUENCY)['value'], topicID)
+        # emitRes(consts.TOP_FREQUENCY, db.readDB(consts.TOP_FREQUENCY)['value'], topicID)
+        emitRes(consts.TOP_FREQUENCY, d_val["value"], topicID)
         return
     
     if not payload.isdigit() or int(payload) < 0 or int(payload) > 10000:
         emitRes(consts.TOP_FREQUENCY, returnError("Frequency must be a number between 0 and 10000"), topicID)
         return
     
-    consts.writeDB(consts.TOP_FREQUENCY, payload)
+    # consts.writeDB(consts.TOP_FREQUENCY, payload)
+    d_val["value"] = int(payload)
     emitRes(consts.TOP_FREQUENCY, consts.RESPONSE_OK, topicID)
 
 def handleTemperature(client, payload, operation, topicID):
+    d_val = None
+    for d in device_sensor:
+        if d["device_id"] == int(topicID) and d["sensor_model_id"] == 1:
+            d_val = d
+            break
+    if d_val is None:
+        return
+    
     if operation == consts.READ:
-        emitRes(consts.TOP_TEMPERATURE, db.readDB(consts.TOP_TEMPERATURE)['value'], topicID)
+        # emitRes(consts.TOP_TEMPERATURE, db.readDB(consts.TOP_TEMPERATURE)['value'], topicID)
+        emitRes(consts.TOP_TEMPERATURE, d_val["value"], topicID)
         return
     
     def validateTemperature():
@@ -89,12 +125,22 @@ def handleTemperature(client, payload, operation, topicID):
         emitRes(consts.TOP_TEMPERATURE, returnError("Temperature must be a number between 0.0 and 100.0, indicating the degrees celsius"), topicID)
         return
     
-    consts.writeDB(consts.TOP_TEMPERATURE, payload)
+    # consts.writeDB(consts.TOP_TEMPERATURE, payload)
+    d_val["value"] = float(payload)
     emitRes(consts.TOP_TEMPERATURE, consts.RESPONSE_OK, topicID)
 
 def handleHumidity(client, payload, operation, topicID):
+    d_val = None
+    for d in device_sensor:
+        if d["device_id"] == int(topicID) and d["sensor_model_id"] == 2:
+            d_val = d
+            break
+    if d_val is None:
+        return
+
     if operation == consts.READ:
-        emitRes(consts.TOP_HUMIDITY, db.readDB(consts.TOP_HUMIDITY)['value'], topicID)
+        # emitRes(consts.TOP_HUMIDITY, db.readDB(consts.TOP_HUMIDITY)['value'], topicID)
+        emitRes(consts.TOP_HUMIDITY, d_val["value"], topicID)
         return
     
     def validateHumidity():
@@ -107,7 +153,8 @@ def handleHumidity(client, payload, operation, topicID):
         emitRes(consts.TOP_HUMIDITY, returnError("Humidity must be a number between 0.0 and 100.0, indicating the humidity percentage"), topicID)
         return
     
-    consts.writeDB(consts.TOP_HUMIDITY, payload)
+    # consts.writeDB(consts.TOP_HUMIDITY, payload)
+    d_val["value"] = float(payload)
     emitRes(consts.TOP_HUMIDITY, consts.RESPONSE_OK, topicID)
 
 def handleMessage(client, topic, topicID, operation, payload):

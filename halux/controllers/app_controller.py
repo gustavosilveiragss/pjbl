@@ -52,6 +52,18 @@ def create_app() -> Flask:
 
         payload = message.payload.decode("utf-8")
 
+        log = dict(
+            mqtt_log_id=len(mqtt_logs) + 1,
+            created_at=datetime.now(),
+            topic=topic,
+            subtopic=subtopic,
+            device_id=topicID,
+            operation=operation,
+            payload=payload,
+        )
+
+        mqtt_logs.append(log)
+
         print(
             f"Time: {datetime.now()} | Topic: {topic} | Subtopic: {subtopic} | Topic ID: {topicID} | Operation: {operation} | Payload: {payload}"
         )

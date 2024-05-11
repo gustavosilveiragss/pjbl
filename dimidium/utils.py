@@ -36,7 +36,7 @@ def returnError(msg):
     return '{"status": "ERROR", "message": "' + msg + '"}'
 
 def genID():
-    return str(os.urandom(4).hex())
+    return str(2)
 
 def emitReq(client, topic, operation, payload, callback=None):
     id = genID()

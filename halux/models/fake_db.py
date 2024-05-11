@@ -3,13 +3,15 @@ device = [
         device_id=1,
         created_at="2024-05-01 00:00:00",
         device_name="Halux",
-        password=""
+        password="",
+        permission_state=0,
     ),
     dict(
         device_id=2,
         created_at="2024-05-01 00:00:00",
         device_name="Test Box",
-        password="000"
+        password="000",
+        permission_state=0,
     )
 ]
 
