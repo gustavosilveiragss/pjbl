@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, make_response
 import utils.consts as consts
+import utils.utils as utils
 from datetime import datetime
 from controllers.iot_controller import iot
 from models.db import instance, db
@@ -23,12 +24,37 @@ def create_app() -> Flask:
     app.config["MQTT_TLS_ENABLED"] = consts.BROKER_TLS_ENABLED
     app.config["SQLALCHEMY_DATABASE_URI"] = instance
 
+    registered_users = [dict(username="admin", password="admin")]
+
     mqtt_client.init_app(app)
     db.init_app(app)
 
-    data_maestro = dict(active_page="dashboard")
+    @app.route("/")
+    def index():
+        if utils.is_authenticated():
+            return redirect("/app")
+        else:
+            return redirect("/login")
 
-    @mqtt_client.on_connect()
+    @app.route("/login")
+    def login():
+        return render_template("login.jinja", data=utils.data)
+
+    @app.route("/authenticate", methods=["POST"])
+    def authenticate():
+        if request.json in registered_users:
+            resp = make_response(jsonify(status="ok"))
+            resp.set_cookie("username", request.json["username"])
+            resp.set_cookie("password", request.json["password"])
+            return resp
+        else:
+            return jsonify(status="error", message="Credenciais inválidas")
+
+    @app.route("/app")
+    def app_page():
+        utils.data["active_page"] = "dashboard"
+        return utils.render_template_if_authenticated("/app.jinja")
+
     def handle_connect(client, userdata, flags, rc):
         if rc == 0:
             print("Connected successfully")
@@ -67,11 +93,6 @@ def create_app() -> Flask:
         if subtopic == consts.REQUEST:
             handleMessage(client, topic, topicID, operation, payload)
 
-    @app.route("/")
-    def index():
-        data_maestro["active_page"] = "dashboard"
-        return render_template("app.jinja", data=data_maestro)
-
     @app.route("/publish", methods=["POST"])
     def publish_message():
         request_data = request.get_json()
@@ -80,19 +101,19 @@ def create_app() -> Flask:
 
     @app.route("/logs")
     def logs():
-        data_maestro["active_page"] = "logs"
-        data_maestro["logs"] = reversed(mqtt_logs)
-        return render_template("logs.jinja", data=data_maestro)
+        utils.data["active_page"] = "logs"
+        utils.data["logs"] = reversed(mqtt_logs)
+        return utils.render_template_if_authenticated("logs.jinja")
 
     @app.route("/devices")
     def devices_route():
-        data_maestro["active_page"] = "devices"
-        data_maestro["devices"] = device
-        return render_template("devices.jinja", data=data_maestro)
+        utils.data["active_page"] = "devices"
+        utils.data["devices"] = device
+        return utils.render_template_if_authenticated("devices.jinja")
 
     @app.route("/devices/<int:device_id>")
     def device_route(device_id):
-        data_maestro["active_page"] = "devices"
+        utils.data["active_page"] = "devices"
 
         # Proper query with the joins will be implmeented once the database gets created
         d = None
@@ -101,12 +122,12 @@ def create_app() -> Flask:
                 d = d_db
                 break
         if d is None:
-            data_maestro["devices"] = device
-            return render_template("devices.jinja", data=data_maestro)
+            utils.data["devices"] = device
+            return utils.render_template_if_authenticated("devices.jinja")
 
-        data_maestro["device"] = d
-        data_maestro["sensors"] = []
-        data_maestro["actuators"] = []
+        utils.data["device"] = d
+        utils.data["sensors"] = []
+        utils.data["actuators"] = []
 
         for d_s in device_sensor:
             if d_s["device_id"] == device_id:
@@ -115,7 +136,7 @@ def create_app() -> Flask:
                     if s["sensor_model_id"] == d_s["sensor_model_id"]:
                         sensor["name"] = s["name"]
                         break
-                data_maestro["sensors"].append(sensor)
+                utils.data["sensors"].append(sensor)
         for d_a in device_actuator:
             if d_a["device_id"] == device_id:
                 actuator = dict(actuator_id=d_a["actuator_model_id"])
@@ -123,9 +144,9 @@ def create_app() -> Flask:
                     if a["actuator_model_id"] == d_a["actuator_model_id"]:
                         actuator["name"] = a["name"]
                         break
-                data_maestro["actuators"].append(actuator)
+                utils.data["actuators"].append(actuator)
 
-        return render_template("edit_device.jinja", data=data_maestro)
+        return utils.render_template_if_authenticated("edit_device.jinja")
 
     @app.route("/edit_device", methods=["PUT"])
     def edit_device():
@@ -164,10 +185,10 @@ def create_app() -> Flask:
 
     @app.route("/devices/new")
     def new_device():
-        data_maestro["active_page"] = "devices"
-        data_maestro["sensors"] = sensor_model
-        data_maestro["actuators"] = actuator_model
-        return render_template("new_device.jinja", data=data_maestro)
+        utils.data["active_page"] = "devices"
+        utils.data["sensors"] = sensor_model
+        utils.data["actuators"] = actuator_model
+        return utis.render_template_if_authenticated("new_device.jinja")
 
     @app.route("/new_device", methods=["POST"])
     def create_device():
@@ -176,7 +197,9 @@ def create_app() -> Flask:
 
         device_id = len(device) + 1
         device.append(
-            dict(device_id=device_id, device_name=device_name, created_at=datetime.now())
+            dict(
+                device_id=device_id, device_name=device_name, created_at=datetime.now()
+            )
         )
 
         for s in sensor_model:

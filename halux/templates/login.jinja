@@ -1,0 +1,53 @@
+{% extends "base.jinja" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<script>
+    window.onload = function () {
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // prevent the form from submitting normally
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+                .then(data => data.json())
+                .then(json => {
+                    if (json.status === 'ok') {
+                        window.location.href = '/';
+                    } else {
+                        alert(`Erro ao autenticar - ${json.message}`);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+    }
+</script>
+</head>
+
+<body>
+    <h2>Login Page</h2>
+    <form id="loginForm">
+        <div class="container">
+            <label for="username"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" id="username" required>
+
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" id="password" required>
+
+            <button type="submit">Login</button>
+        </div>
+    </form>
+</body>
+
+</html>
+
+
+{% endblock %}
