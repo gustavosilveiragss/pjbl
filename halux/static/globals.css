@@ -3,6 +3,10 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+a {
+    text-decoration: none;
+}
+
 /* NAVBAR */
 
 .navbar {
@@ -16,7 +20,6 @@ body {
     color: #f2f2f2;
     text-align: center;
     padding: 14px 16px;
-    text-decoration: none;
     font-size: 17px;
     margin: 0;
 }
@@ -152,4 +155,81 @@ form button,
 
 .max-width-btn {
     width: auto !important;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 30px;
+}
+
+.section {
+    flex: 1;
+    margin-right: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+p {
+    font-size: 20px;
+    margin: 10px 0;
+    color: #666;
+}
+
+.red-txt {
+    color: #f00;
+}
+
+.green-txt {
+    color: #0f0;
+}
+
+.input-field {
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    font-size: 22px;
+}
+
+.input-field input {
+    font-size: 18px;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #9e9e9e;
+    outline: none;
+    transition: .2s ease-in-out;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.input-field label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 16px;
+    color: #9e9e9e;
+    transition: .2s ease-in-out;
+}
+
+.input-field input:focus,
+.input-field input:not(:placeholder-shown) {
+    padding-top: 20px;
+}
+
+.input-field input:focus + label,
+.input-field input:not(:placeholder-shown) + label {
+    color: #4caf50;
+    transform: translateY(-20px);
 }

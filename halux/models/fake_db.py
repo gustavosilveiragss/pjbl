@@ -78,7 +78,7 @@ device_actuator = [
         device_id=2,
         actuator_model_id=2,
         updated_at="2024-05-01 00:00:00",
-        value=0
+        value=800
     ),
 ]
 

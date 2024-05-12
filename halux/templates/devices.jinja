@@ -13,17 +13,20 @@
         <th>Actions</th>
     </tr>
     {% for d in data.devices %}
+    
     <tr>
         <td>{{ d.device_id }}</td>
         <td>{{ d.created_at }}</td>
         <td>{{ d.device_name }}</td>
         <td>
+            {% if d.device_id != 1 %}
             <a href="/devices/{{ d.device_id }}" class="action-button edit-button">
                 <i class="fa fa-pencil"></i>
             </a>
             <button onclick="deleteDevice({{ d.device_id }})" class="action-button delete-button">
                 <i class="fa fa-times"></i>
             </button>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}

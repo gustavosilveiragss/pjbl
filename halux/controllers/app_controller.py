@@ -32,7 +32,7 @@ def create_app() -> Flask:
     @app.route("/")
     def index():
         if utils.is_authenticated():
-            return redirect("/app")
+            return redirect("/dashboard")
         else:
             return redirect("/login")
 
@@ -50,11 +50,54 @@ def create_app() -> Flask:
         else:
             return jsonify(status="error", message="Credenciais inválidas")
 
-    @app.route("/app")
-    def app_page():
+    @app.route("/dashboard")
+    def dashboard_default():
         utils.data["active_page"] = "dashboard"
-        return utils.render_template_if_authenticated("/app.jinja")
 
+        # Redirect to the first device that is not the central Halux device, if it exists
+        for d in device:
+            if d["device_id"] != 1:
+                return redirect("/dashboard/" + str(d["device_id"]))
+
+        return redirect("/devices")
+
+    @app.route("/dashboard/<int:device_id>")
+    def dashboard(device_id):
+        utils.data["active_page"] = "dashboard"
+
+        d = None
+        for d_db in device:
+            if d_db["device_id"] == device_id:
+                d = d_db
+                break
+        if d is None or d["device_id"] == 1:
+            return redirect("/devices")
+        
+        utils.data["device"] = d
+
+        utils.data["devices"] = [d]
+        for d_db in device:
+            if d_db["device_id"] != device_id and d_db["device_id"] != 1:
+                utils.data["devices"].append(d_db)
+
+        for d_s in device_sensor:
+            if d_s["device_id"] == device_id:
+                match d_s["sensor_model_id"]:
+                    case 1:
+                        utils.data["temperature"] = d_s["value"]
+                    case 2:
+                        utils.data["humidity"] = d_s["value"]
+                    case 3:
+                        utils.data["open"] = d_s["value"]
+
+        for d_a in device_actuator:
+            if d_a["device_id"] == device_id:
+                if d_a["actuator_model_id"] == 2:
+                    utils.data["frequency"] = d_a["value"]
+
+        return utils.render_template_if_authenticated("dashboard.jinja")
+    
+    @mqtt_client.on_connect()
     def handle_connect(client, userdata, flags, rc):
         if rc == 0:
             print("Connected successfully")
@@ -152,6 +195,9 @@ def create_app() -> Flask:
     def edit_device():
         request_data = request.get_json()
         device_id = request_data["device_id"]
+        if device_id == 1:
+            return jsonify({"status": "Cannot edit the central Halux device"}), 400
+
         device_name = request_data["name"]
 
         d = None
@@ -170,6 +216,8 @@ def create_app() -> Flask:
     def delete_device():
         request_data = request.get_json()
         device_id = request_data["device_id"]
+        if device_id == 1:
+            return jsonify({"status": "Cannot delete the central Halux device"}), 400
 
         d = None
         for d_db in device:
@@ -188,7 +236,7 @@ def create_app() -> Flask:
         utils.data["active_page"] = "devices"
         utils.data["sensors"] = sensor_model
         utils.data["actuators"] = actuator_model
-        return utis.render_template_if_authenticated("new_device.jinja")
+        return utils.render_template_if_authenticated("new_device.jinja")
 
     @app.route("/new_device", methods=["POST"])
     def create_device():
@@ -207,6 +255,8 @@ def create_app() -> Flask:
                 dict(
                     device_id=device_id,
                     sensor_model_id=s["sensor_model_id"],
+                    updated_at=datetime.now(),
+                    value=None,
                 )
             )
 
@@ -215,6 +265,8 @@ def create_app() -> Flask:
                 dict(
                     device_id=device_id,
                     actuator_model_id=a["actuator_model_id"],
+                    updated_at=datetime.now(),
+                    value=None,
                 )
             )
 
