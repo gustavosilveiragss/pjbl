@@ -76,14 +76,14 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     nvs_handle_t nvs_handle;
     nvs_open("storage", NVS_READWRITE, &nvs_handle);
 
-    if (topic_sv == "PASSWORD/RES/1") {
+    if (topic_sv == "PASSWORD/RES/2") {
         for (size_t i = 0; i < g_password.size(); ++i)
             g_password[i] = payload[i] - '0';
 
         Serial.printf("New password: %d %d %d\n", g_password[0], g_password[1], g_password[2]);
 
         nvs_set_blob(nvs_handle, "password", g_password.data(), sizeof(g_password));
-    } else if (topic_sv == "FREQUENCY/RES/1") {
+    } else if (topic_sv == "FREQUENCY/RES/2") {
         std::sscanf(reinterpret_cast<const char*>(payload), "%d", &g_buzzer_frequency);
         nvs_set_i32(nvs_handle, "frequency", g_buzzer_frequency);
         Serial.printf("New buzzer frequency: %d\n", g_buzzer_frequency);
@@ -124,7 +124,7 @@ void loop() {
     while (true) {
         if (not g_mqtt_client.connected()) {
             connect_to_mqtt_broker();
-            g_mqtt_client.publish("PERMISSION_STATE/REQ/2/W", "false");
+            g_mqtt_client.publish("PERMISSION_STATE/REQ/2/W", "0");
             g_mqtt_client.publish("IR_STATE/REQ/2/W", is_lid_open ? "1" : "0");
         }
 
@@ -152,7 +152,7 @@ void loop() {
                         Serial.println(got_correct_password ? "Correct password!" : "Wrong password!");
                         password_attempt.clear();
 
-                        g_mqtt_client.publish("PERMISSION_STATE/REQ/2/W", got_correct_password ? "true" : "false");
+                        g_mqtt_client.publish("PERMISSION_STATE/REQ/2/W", got_correct_password ? "1" : "0");
 
                         if (got_correct_password)
                             noTone(BUZZER_PIN);
@@ -182,7 +182,7 @@ void loop() {
                 Serial.println("Lid closed!");
 
                 got_correct_password = false;
-                g_mqtt_client.publish("PERMISSION_STATE/REQ/2/W", "false");
+                g_mqtt_client.publish("PERMISSION_STATE/REQ/2/W", "0");
             }
 
             g_mqtt_client.publish("IR_STATE/REQ/2/W", is_lid_open ? "1" : "0");
