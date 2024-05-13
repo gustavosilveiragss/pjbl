@@ -1,0 +1,45 @@
+{% extends "base.jinja" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<table>
+    <tr>
+        <th>Created At</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>ID</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.user_id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.password }}</td>
+        <td>{{ user.created_at }}</td>
+        <td>
+            <button onclick="deleteUser({{ user.user_id }})" class="action-button delete-button">
+                <i class="fa fa-times"></i>
+            </button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<script>
+    function deleteUser(user_id) {
+        fetch('/delete_user', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id
+            })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('An error occurred while deleting the user');
+            }
+        });
+    }
+
+</script>
+{% endblock %}

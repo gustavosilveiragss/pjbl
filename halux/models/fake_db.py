@@ -12,7 +12,7 @@ device = [
         device_name="Test Box",
         password="000",
         permission_state=0,
-    )
+    ),
 ]
 
 sensor_model = [
@@ -47,39 +47,14 @@ actuator_model = [
 ]
 
 device_sensor = [
-    dict(
-        device_id=2,
-        sensor_model_id=1,
-        updated_at="2024-05-01 00:00:00",
-        value=25
-    ),
-    dict(
-        device_id=2,
-        sensor_model_id=2,
-        updated_at="2024-05-01 00:00:00",
-        value=50
-    ),
-    dict(
-        device_id=2,
-        sensor_model_id=3,
-        updated_at="2024-05-01 00:00:00",
-        value=1
-    ),
+    dict(device_id=2, sensor_model_id=1, updated_at="2024-05-01 00:00:00", value=25),
+    dict(device_id=2, sensor_model_id=2, updated_at="2024-05-01 00:00:00", value=50),
+    dict(device_id=2, sensor_model_id=3, updated_at="2024-05-01 00:00:00", value=1),
 ]
 
 device_actuator = [
-    dict(
-        device_id=2,
-        actuator_model_id=1,
-        updated_at="2024-05-01 00:00:00",
-        value=0
-    ),
-    dict(
-        device_id=2,
-        actuator_model_id=2,
-        updated_at="2024-05-01 00:00:00",
-        value=800
-    ),
+    dict(device_id=2, actuator_model_id=1, updated_at="2024-05-01 00:00:00", value=0),
+    dict(device_id=2, actuator_model_id=2, updated_at="2024-05-01 00:00:00", value=800),
 ]
 
 user = [
@@ -88,14 +63,12 @@ user = [
         created_at="2024-05-01 00:00:00",
         username="admin",
         password="admin",
-        admin=1
     ),
     dict(
         user_id=2,
         created_at="2024-05-01 00:00:00",
         username="user",
         password="user",
-        admin=0
     ),
 ]
 
@@ -107,7 +80,7 @@ mqtt_logs = [
         subtopic="REQ",
         device_id=2,
         operation="W",
-        payload="1"
+        payload="1",
     ),
     dict(
         mqtt_log_id=2,
@@ -116,7 +89,7 @@ mqtt_logs = [
         subtopic="REQ",
         device_id=2,
         operation="W",
-        payload="1"
+        payload="1",
     ),
     dict(
         mqtt_log_id=3,
@@ -125,7 +98,7 @@ mqtt_logs = [
         subtopic="REQ",
         device_id=2,
         operation="W",
-        payload="000"
+        payload="000",
     ),
     dict(
         mqtt_log_id=4,
@@ -134,7 +107,7 @@ mqtt_logs = [
         subtopic="REQ",
         device_id=2,
         operation="W",
-        payload="100"
+        payload="100",
     ),
     dict(
         mqtt_log_id=5,
@@ -143,7 +116,7 @@ mqtt_logs = [
         subtopic="REQ",
         device_id=2,
         operation="W",
-        payload="25"
+        payload="25",
     ),
     dict(
         mqtt_log_id=6,
@@ -152,6 +125,6 @@ mqtt_logs = [
         subtopic="REQ",
         device_id=2,
         operation="W",
-        payload="30"
+        payload="30",
     ),
 ]

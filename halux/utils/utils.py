@@ -4,7 +4,7 @@ data = dict(active_page="dashboard")
 
 
 def is_authenticated():
-    return "username" in request.cookies and "password" in request.cookies
+    return "user_id" in request.cookies and int(request.cookies["user_id"]) >= 1
 
 
 def render_template_if_authenticated(route: str, **kwargs):
