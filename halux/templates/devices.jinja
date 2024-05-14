@@ -34,7 +34,7 @@
 
 <script>
     function deleteDevice(device_id) {
-        fetch('/delete_device', {
+        fetch('/devices/delete_device', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'

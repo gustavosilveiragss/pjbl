@@ -7,6 +7,7 @@ from models.db import instance, db
 from models.mqtt import mqtt_client, topics_subscribe, handleMessage
 from models.fake_db import *
 from controllers.users_controller import users
+from controllers.devices_controller import devices
 
 
 def create_app() -> Flask:
@@ -19,6 +20,7 @@ def create_app() -> Flask:
 
     app.register_blueprint(iot, url_prefix="/iot")
     app.register_blueprint(users, url_prefix="/users")
+    app.register_blueprint(devices, url_prefix="/devices")
 
     app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
     app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
@@ -169,128 +171,5 @@ def create_app() -> Flask:
         utils.data["active_page"] = "logs"
         utils.data["logs"] = reversed(mqtt_logs)
         return utils.render_template_if_authenticated("logs.jinja")
-
-    @app.route("/devices")
-    def devices_route():
-        utils.data["active_page"] = "devices"
-        utils.data["devices"] = device
-        return utils.render_template_if_admin("devices.jinja")
-
-    @app.route("/devices/<int:device_id>")
-    def device_route(device_id):
-        utils.data["active_page"] = "devices"
-
-        # Proper query with the joins will be implmeented once the database gets created
-        d = None
-        for d_db in device:
-            if d_db["device_id"] == device_id:
-                d = d_db
-                break
-        if d is None:
-            return redirect("/devices")
-
-        utils.data["device"] = d
-        utils.data["sensors"] = []
-        utils.data["actuators"] = []
-
-        for d_s in device_sensor:
-            if d_s["device_id"] == device_id:
-                sensor = dict(sensor_id=d_s["sensor_model_id"])
-                for s in sensor_model:
-                    if s["sensor_model_id"] == d_s["sensor_model_id"]:
-                        sensor["name"] = s["name"]
-                        break
-                utils.data["sensors"].append(sensor)
-        for d_a in device_actuator:
-            if d_a["device_id"] == device_id:
-                actuator = dict(actuator_id=d_a["actuator_model_id"])
-                for a in actuator_model:
-                    if a["actuator_model_id"] == d_a["actuator_model_id"]:
-                        actuator["name"] = a["name"]
-                        break
-                utils.data["actuators"].append(actuator)
-
-        return utils.render_template_if_admin("edit_device.jinja")
-
-    @app.route("/edit_device", methods=["PUT"])
-    def edit_device():
-        request_data = request.get_json()
-        device_id = request_data["device_id"]
-        if device_id == 1:
-            return jsonify({"status": "Cannot edit the central Halux device"}), 400
-
-        device_name = request_data["name"]
-
-        d = None
-        for d_db in device:
-            if d_db["device_id"] == device_id:
-                d = d_db
-                break
-        if d is None:
-            return jsonify({"status": "Device not found"}), 400
-
-        d["device_name"] = device_name
-
-        return jsonify({"status": "OK"})
-
-    @app.route("/delete_device", methods=["DELETE"])
-    def delete_device():
-        request_data = request.get_json()
-        device_id = request_data["device_id"]
-        if device_id == 1:
-            return jsonify({"status": "Cannot delete the central Halux device"}), 400
-
-        d = None
-        for d_db in device:
-            if d_db["device_id"] == device_id:
-                d = d_db
-                break
-        if d is None:
-            return jsonify({"status": "Device not found"}), 400
-
-        device.remove(d)
-
-        return jsonify({"status": "OK"})
-
-    @app.route("/devices/new")
-    def new_device():
-        utils.data["active_page"] = "devices"
-        utils.data["sensors"] = sensor_model
-        utils.data["actuators"] = actuator_model
-        return utils.render_template_if_admin("new_device.jinja")
-
-    @app.route("/new_device", methods=["POST"])
-    def create_device():
-        request_data = request.get_json()
-        device_name = request_data["name"]
-
-        device_id = device[-1]["device_id"] + 1
-        device.append(
-            dict(
-                device_id=device_id, device_name=device_name, created_at=datetime.now()
-            )
-        )
-
-        for s in sensor_model:
-            device_sensor.append(
-                dict(
-                    device_id=device_id,
-                    sensor_model_id=s["sensor_model_id"],
-                    updated_at=datetime.now(),
-                    value=None,
-                )
-            )
-
-        for a in actuator_model:
-            device_actuator.append(
-                dict(
-                    device_id=device_id,
-                    actuator_model_id=a["actuator_model_id"],
-                    updated_at=datetime.now(),
-                    value=None,
-                )
-            )
-
-        return jsonify({"status": "OK"})
 
     return app
