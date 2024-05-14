@@ -7,7 +7,7 @@ def is_authenticated():
     return "user_id" in request.cookies and int(request.cookies["user_id"]) >= 1
 
 
-def render_template_if_authenticated(route: str, **kwargs):
+def render_template_if_authenticated(template: str, **kwargs):
     if not is_authenticated():
         return redirect("/")
-    return render_template(route, data=data, **kwargs)
+    return render_template(template, data=data, cookies=request.cookies, **kwargs)
