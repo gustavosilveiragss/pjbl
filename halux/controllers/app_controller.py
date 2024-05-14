@@ -18,13 +18,13 @@ def create_app() -> Flask:
 
     app.register_blueprint(iot, url_prefix="/iot")
 
-    app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
-    app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
-    app.config["MQTT_KEEPALIVE"] = consts.BROKER_KEEPALIVE
-    app.config["MQTT_TLS_ENABLED"] = consts.BROKER_TLS_ENABLED
+    # app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
+    # app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
+    # app.config["MQTT_KEEPALIVE"] = consts.BROKER_KEEPALIVE
+    # app.config["MQTT_TLS_ENABLED"] = consts.BROKER_TLS_ENABLED
     app.config["SQLALCHEMY_DATABASE_URI"] = instance
 
-    mqtt_client.init_app(app)
+    # mqtt_client.init_app(app)
     db.init_app(app)
 
     @app.route("/")
@@ -37,7 +37,7 @@ def create_app() -> Flask:
     @app.route("/login")
     def login():
         utils.data["active_page"] = ""
-        return render_template("login.jinja", data=utils.data)
+        return render_template("login.jinja", data=utils.data, cookies=request.cookies)
 
     @app.route("/authenticate", methods=["POST"])
     def authenticate():
@@ -172,8 +172,7 @@ def create_app() -> Flask:
                 d = d_db
                 break
         if d is None:
-            utils.data["devices"] = device
-            return utils.render_template_if_authenticated("devices.jinja")
+            return redirect("/devices")
 
         utils.data["device"] = d
         utils.data["sensors"] = []
@@ -283,10 +282,65 @@ def create_app() -> Flask:
     def users_route():
         return utils.render_template_if_authenticated("users.jinja", users=user)
 
+    @app.route("/users/new")
+    def user_device():
+        utils.data["active_page"] = "users"
+        return utils.render_template_if_authenticated("new_user.jinja")
+
+    @app.route("/new_user", methods=["POST"])
+    def create_user():
+        username = request.json["username"]
+        password = request.json["password"]
+
+        user_id = len(user) + 1
+        user.append(
+            dict(
+                user_id=user_id,
+                username=username,
+                password=password,
+                created_at=datetime.now(),
+            )
+        )
+
+        return jsonify({"status": "OK"})
+
+    @app.route("/users/<int:user_id>")
+    def edit_user_route(user_id):
+        utils.data["active_page"] = "users"
+
+        u = None
+        for u_db in user:
+            if u_db["user_id"] == user_id:
+                u = u_db
+                break
+        if u is None:
+            return utils.render_template_if_authenticated("users.jinja")
+
+        return utils.render_template_if_authenticated("edit_user.jinja", user=u)
+
+    @app.route("/edit_user", methods=["PUT"])
+    def edit_user():
+        user_id = request.json["user_id"]
+
+        username = request.json["username"]
+        password = request.json["password"]
+
+        u = None
+        for u_db in user:
+            if u_db["user_id"] == user_id:
+                u = u_db
+                break
+        if u is None:
+            return jsonify({"status": "User not found"}), 400
+
+        u["username"] = username
+        u["password"] = password
+
+        return jsonify({"status": "OK"})
+
     @app.route("/delete_user", methods=["DELETE"])
     def delete_user():
-        request_data = request.get_json()
-        user_id = request_data["user_id"]
+        user_id = request.json["user_id"]
         if user_id == 1:
             return jsonify({"status": "Cannot delete the admin user"}), 400
 
@@ -301,7 +355,6 @@ def create_app() -> Flask:
         user.remove(u)
         if user_id == request.cookies["user_id"]:
             request.cookies.pop("user_id")
-            utils.data.pop("user_id")
 
         return jsonify({"status": "OK"})
 

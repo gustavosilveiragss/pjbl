@@ -1,11 +1,11 @@
 {% extends "base.jinja" %}
-{% block title %}{{ data.user.username }}{% endblock %}
+{% block title %}New User{% endblock %}
 {% block content %}
 <form id="edit-form">
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value='{{ data.user.username }}'>
+    <input type="text" id="username" name="username" value=''>
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password" value='{{ data.user.password }}'>
+    <input type="password" id="password" name="password" value=''>
     <input type="submit" value="Submit">
 </form>
 
@@ -16,17 +16,22 @@
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        fetch('/edit_user', {
-            method: 'PUT',
+        fetch('/new_user', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                user_id: {{ data.user.user_id }},
-            username,
-            password,
+                username,
+                password,
             }),
-        }).then(response => alert(response.ok ? 'User updated' : 'Error updating user'));
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/users';
+            } else {
+                alert('Error creating user');
+            }
+        });
     });
 </script>
 {% endblock %}

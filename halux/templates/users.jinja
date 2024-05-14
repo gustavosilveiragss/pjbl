@@ -1,12 +1,17 @@
 {% extends "base.jinja" %}
 {% block title %}Users{% endblock %}
 {% block content %}
+<form>
+    <a href='/users/new' class='max-width-btn'>Add User</a>
+</form>
+
 <table>
     <tr>
         <th>Created At</th>
         <th>Username</th>
         <th>Password</th>
         <th>ID</th>
+        <th>Actions</th>
     </tr>
     {% for user in users %}
     <tr>
@@ -15,6 +20,9 @@
         <td>{{ user.password }}</td>
         <td>{{ user.created_at }}</td>
         <td>
+            <a href="/users/{{ user.user_id }}" class="action-button edit-button">
+                <i class="fa fa-pencil"></i>
+            </a>
             <button onclick="deleteUser({{ user.user_id }})" class="action-button delete-button">
                 <i class="fa fa-times"></i>
             </button>

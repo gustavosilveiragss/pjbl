@@ -1,11 +1,11 @@
 {% extends "base.jinja" %}
-{% block title %}{{ data.user.username }}{% endblock %}
+{% block title %}{{ user.username }}{% endblock %}
 {% block content %}
 <form id="edit-form">
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value='{{ data.user.username }}'>
+    <input type="text" id="username" name="username" value='{{ user.username }}'>
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password" value='{{ data.user.password }}'>
+    <input type="password" id="password" name="password" value='{{ user.password }}'>
     <input type="submit" value="Submit">
 </form>
 
@@ -22,7 +22,7 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                user_id: {{ data.user.user_id }},
+                user_id: {{ user.user_id }},
             username,
             password,
             }),
