@@ -39,7 +39,7 @@ void setup() {
     pinMode(BUZZER_PIN, OUTPUT);
     pinMode(IR_PIN, INPUT_PULLUP);
 
-    connect_to_wifi("", "");
+    connect_to_wifi("VISITANTES", "");
     g_mqtt_client.setServer("broker.emqx.io", 1883);
 
     nvs_flash_init();

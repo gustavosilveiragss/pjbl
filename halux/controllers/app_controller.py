@@ -93,11 +93,11 @@ def create_app() -> Flask:
             if d_s["device_id"] == device_id:
                 match d_s["sensor_model_id"]:
                     case 1:
-                        utils.data["temperature"] = d_s["value"]
+                        utils.data["temperature"] = f"{d_s['value']:.2f}"
                     case 2:
-                        utils.data["humidity"] = d_s["value"]
+                        utils.data["humidity"] = f"{d_s['value']:.2f}"
                     case 3:
-                        utils.data["open"] = d_s["value"]
+                        utils.data["open"] = d_s['value']
 
         for d_a in device_actuator:
             if d_a["device_id"] == device_id:
@@ -130,6 +130,8 @@ def create_app() -> Flask:
 
         payload = message.payload.decode("utf-8")
 
+        print(f"Received message: {topic}/{subtopic}/{topicID}/{operation} - {payload}")
+
         log = dict(
             mqtt_log_id=len(mqtt_logs) + 1,
             created_at=datetime.now(),
@@ -145,10 +147,21 @@ def create_app() -> Flask:
         if subtopic == consts.REQUEST:
             handleMessage(client, topic, topicID, operation, payload)
 
-    @app.route("/publish", methods=["POST"])
+    @app.route("/publish_mqtt", methods=["POST"])
     def publish_message():
         request_data = request.get_json()
-        result, _ = mqtt_client.publish(request_data["topic"], request_data["message"])
+        topic = request_data["topic"]
+        result, _ = mqtt_client.publish(topic, request_data["payload"], 1)
+        
+        jsonRes = jsonify(result)
+        
+        if jsonRes.status == "ERROR":
+            return jsonRes
+        
+        topic = topic[:-1] + "R"
+        print(topic)
+        
+        result, _ = mqtt_client.publish(topic, request_data["payload"], 1)
         return jsonify(result)
 
     @app.route("/logs")
