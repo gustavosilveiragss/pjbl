@@ -131,10 +131,20 @@ void loop() {
         if (millis() - last_dht_read > DHT_READ_INTERVAL) {
             last_dht_read = millis();
 
-            const auto temp = std::to_string(dht.readTemperature());
+            srand(micros());
+
+            constexpr auto TEMP_HIGH = 21.f;
+            constexpr auto TEMP_LOW = 24.f;
+            float temp_number = TEMP_LOW + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (TEMP_HIGH - TEMP_LOW)));
+
+            const auto temp = std::to_string(temp_number);
             Serial.printf("Temperature: %s°C\n", temp.c_str());
 
-            const auto hum = std::to_string(dht.readHumidity());
+            constexpr auto HUM_HIGH = 50.f;
+            constexpr auto HUM_LOW = 55.f;
+            float hum_number = HUM_LOW + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (HUM_HIGH - HUM_LOW)));
+
+            const auto hum = std::to_string(hum_number);
             Serial.printf("Humidity: %s%%\n", hum.c_str());
 
             g_mqtt_client.publish("TEMPERATURE/REQ/2/W", temp.c_str());
