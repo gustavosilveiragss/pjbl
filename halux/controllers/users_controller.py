@@ -13,6 +13,7 @@ users = Blueprint(
 
 @users.route("/")
 def users_route():
+    utils.data["active_page"] = "users"
     return utils.render_template_if_admin("users.jinja", users=user)
 
 
@@ -20,6 +21,21 @@ def users_route():
 def user_device():
     utils.data["active_page"] = "users"
     return utils.render_template_if_admin("new_user.jinja")
+
+
+@users.route("/<int:user_id>")
+def edit_user_route(user_id):
+    utils.data["active_page"] = "users"
+
+    u = None
+    for u_db in user:
+        if u_db["user_id"] == user_id:
+            u = u_db
+            break
+    if u is None:
+        return utils.render_template_if_admin("users.jinja")
+
+    return utils.render_template_if_admin("edit_user.jinja", user=u)
 
 
 @users.route("/new_user", methods=["POST"])
@@ -38,21 +54,6 @@ def create_user():
     )
 
     return jsonify({"status": "OK"})
-
-
-@users.route("/<int:user_id>")
-def edit_user_route(user_id):
-    utils.data["active_page"] = "users"
-
-    u = None
-    for u_db in user:
-        if u_db["user_id"] == user_id:
-            u = u_db
-            break
-    if u is None:
-        return utils.render_template_if_admin("users.jinja")
-
-    return utils.render_template_if_admin("edit_user.jinja", user=u)
 
 
 @users.route("/edit_user", methods=["PUT"])
