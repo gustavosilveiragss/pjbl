@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from utils import utils
+from datetime import datetime
 from models.fake_db import *
 
 users = Blueprint(
@@ -41,10 +42,13 @@ def edit_user_route(user_id):
 @users.route("/new_user", methods=["POST"])
 def create_user():
     username = request.json["username"]
+    if username == "admin":
+        return jsonify({"status": "Cannot create a user with the username 'admin'"}), 400
+
     password = request.json["password"]
 
-    user_id = len(user) + 1
-    user.users.nd(
+    user_id = user[-1]["user_id"] + 1
+    user.append(
         dict(
             user_id=user_id,
             username=username,

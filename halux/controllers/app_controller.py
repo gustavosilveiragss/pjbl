@@ -20,13 +20,13 @@ def create_app() -> Flask:
     app.register_blueprint(iot, url_prefix="/iot")
     app.register_blueprint(users, url_prefix="/users")
 
-    # app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
-    # app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
-    # app.config["MQTT_KEEPALIVE"] = consts.BROKER_KEEPALIVE
-    # app.config["MQTT_TLS_ENABLED"] = consts.BROKER_TLS_ENABLED
+    app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
+    app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
+    app.config["MQTT_KEEPALIVE"] = consts.BROKER_KEEPALIVE
+    app.config["MQTT_TLS_ENABLED"] = consts.BROKER_TLS_ENABLED
     app.config["SQLALCHEMY_DATABASE_URI"] = instance
 
-    # mqtt_client.init_app(app)
+    mqtt_client.init_app(app)
     db.init_app(app)
 
     @app.route("/")
@@ -93,11 +93,11 @@ def create_app() -> Flask:
             if d_s["device_id"] == device_id:
                 match d_s["sensor_model_id"]:
                     case 1:
-                        utils.data["temperature"] = f"{d_s['value']:.2f}"
+                        utils.data["temperature"] = f"{(d_s['value'] or 0.0):.2f}"
                     case 2:
-                        utils.data["humidity"] = f"{d_s['value']:.2f}"
+                        utils.data["humidity"] = f"{(d_s['value'] or 0.0):.2f}"
                     case 3:
-                        utils.data["open"] = d_s['value']
+                        utils.data["open"] = d_s["value"]
 
         for d_a in device_actuator:
             if d_a["device_id"] == device_id:
@@ -152,15 +152,15 @@ def create_app() -> Flask:
         request_data = request.get_json()
         topic = request_data["topic"]
         result, _ = mqtt_client.publish(topic, request_data["payload"], 1)
-        
+
         jsonRes = jsonify(result)
-        
+
         if jsonRes.status == "ERROR":
             return jsonRes
-        
+
         topic = topic[:-1] + "R"
         print(topic)
-        
+
         result, _ = mqtt_client.publish(topic, request_data["payload"], 1)
         return jsonify(result)
 
@@ -264,7 +264,7 @@ def create_app() -> Flask:
         request_data = request.get_json()
         device_name = request_data["name"]
 
-        device_id = len(device) + 1
+        device_id = device[-1]["device_id"] + 1
         device.append(
             dict(
                 device_id=device_id, device_name=device_name, created_at=datetime.now()
