@@ -16,7 +16,7 @@
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        fetch('/edit_user', {
+        fetch('/users/edit_user', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ from controllers.iot_controller import iot
 from models.db import instance, db
 from models.mqtt import mqtt_client, topics_subscribe, handleMessage
 from models.fake_db import *
+from controllers.users_controller import users
 
 
 def create_app() -> Flask:
@@ -17,6 +18,7 @@ def create_app() -> Flask:
     )
 
     app.register_blueprint(iot, url_prefix="/iot")
+    app.register_blueprint(users, url_prefix="/users")
 
     # app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
     # app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
@@ -159,7 +161,7 @@ def create_app() -> Flask:
     def devices_route():
         utils.data["active_page"] = "devices"
         utils.data["devices"] = device
-        return utils.render_template_if_authenticated("devices.jinja")
+        return utils.render_template_if_admin("devices.jinja")
 
     @app.route("/devices/<int:device_id>")
     def device_route(device_id):
@@ -195,7 +197,7 @@ def create_app() -> Flask:
                         break
                 utils.data["actuators"].append(actuator)
 
-        return utils.render_template_if_authenticated("edit_device.jinja")
+        return utils.render_template_if_admin("edit_device.jinja")
 
     @app.route("/edit_device", methods=["PUT"])
     def edit_device():
@@ -242,7 +244,7 @@ def create_app() -> Flask:
         utils.data["active_page"] = "devices"
         utils.data["sensors"] = sensor_model
         utils.data["actuators"] = actuator_model
-        return utils.render_template_if_authenticated("new_device.jinja")
+        return utils.render_template_if_admin("new_device.jinja")
 
     @app.route("/new_device", methods=["POST"])
     def create_device():
@@ -275,86 +277,6 @@ def create_app() -> Flask:
                     value=None,
                 )
             )
-
-        return jsonify({"status": "OK"})
-
-    @app.route("/users")
-    def users_route():
-        return utils.render_template_if_authenticated("users.jinja", users=user)
-
-    @app.route("/users/new")
-    def user_device():
-        utils.data["active_page"] = "users"
-        return utils.render_template_if_authenticated("new_user.jinja")
-
-    @app.route("/new_user", methods=["POST"])
-    def create_user():
-        username = request.json["username"]
-        password = request.json["password"]
-
-        user_id = len(user) + 1
-        user.append(
-            dict(
-                user_id=user_id,
-                username=username,
-                password=password,
-                created_at=datetime.now(),
-            )
-        )
-
-        return jsonify({"status": "OK"})
-
-    @app.route("/users/<int:user_id>")
-    def edit_user_route(user_id):
-        utils.data["active_page"] = "users"
-
-        u = None
-        for u_db in user:
-            if u_db["user_id"] == user_id:
-                u = u_db
-                break
-        if u is None:
-            return utils.render_template_if_authenticated("users.jinja")
-
-        return utils.render_template_if_authenticated("edit_user.jinja", user=u)
-
-    @app.route("/edit_user", methods=["PUT"])
-    def edit_user():
-        user_id = request.json["user_id"]
-
-        username = request.json["username"]
-        password = request.json["password"]
-
-        u = None
-        for u_db in user:
-            if u_db["user_id"] == user_id:
-                u = u_db
-                break
-        if u is None:
-            return jsonify({"status": "User not found"}), 400
-
-        u["username"] = username
-        u["password"] = password
-
-        return jsonify({"status": "OK"})
-
-    @app.route("/delete_user", methods=["DELETE"])
-    def delete_user():
-        user_id = request.json["user_id"]
-        if user_id == 1:
-            return jsonify({"status": "Cannot delete the admin user"}), 400
-
-        u = None
-        for u_db in user:
-            if u_db["user_id"] == user_id:
-                u = u_db
-                break
-        if u is None:
-            return jsonify({"status": "User not found"}), 400
-
-        user.remove(u)
-        if user_id == request.cookies["user_id"]:
-            request.cookies.pop("user_id")
 
         return jsonify({"status": "OK"})
 

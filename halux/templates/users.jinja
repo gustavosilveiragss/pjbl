@@ -23,16 +23,18 @@
             <a href="/users/{{ user.user_id }}" class="action-button edit-button">
                 <i class="fa fa-pencil"></i>
             </a>
+            {% if user.user_id != 1 %}
             <button onclick="deleteUser({{ user.user_id }})" class="action-button delete-button">
                 <i class="fa fa-times"></i>
             </button>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}
 </table>
 <script>
     function deleteUser(user_id) {
-        fetch('/delete_user', {
+        fetch('/users/delete_user', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
