@@ -16,7 +16,7 @@
     </tr>
     {% for s in data.sensors %}
     <tr>
-        <td>{{ s.sensor_id }}</td>
+        <td>{{ s.device_sensor_id }}</td>
         <td>{{ s.name }}</td>
     </tr>
     {% endfor %}
@@ -32,7 +32,7 @@
     </tr>
     {% for a in data.actuators %}
     <tr>
-        <td>{{ a.actuator_id }}</td>
+        <td>{{ a.device_actuator_id }}</td>
         <td>{{ a.name }}</td>
     </tr>
     {% endfor %}

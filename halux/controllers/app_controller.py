@@ -3,12 +3,12 @@ from models.device import Device
 import utils.consts as consts
 import utils.utils as utils
 from datetime import datetime
-from controllers.iot_controller import iot
 from models.db import instance, db
 from models.mqtt import mqtt_client, topics_subscribe, handleMessage
 from models.fake_db import *
 from controllers.users_controller import users
 from controllers.devices_controller import devices
+from controllers.logs_controller import logs
 
 
 def create_app() -> Flask:
@@ -24,9 +24,9 @@ def create_app() -> Flask:
     app.config["SECRET_KEY"] = "PJBL"
     db.init_app(app)
 
-    app.register_blueprint(iot, url_prefix="/iot")
     app.register_blueprint(users, url_prefix="/users")
     app.register_blueprint(devices, url_prefix="/devices")
+    app.register_blueprint(logs, url_prefix="/logs")
 
     app.config["MQTT_BROKER_URL"] = consts.BROKER_URL
     app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
@@ -163,11 +163,5 @@ def create_app() -> Flask:
 
         result, _ = mqtt_client.publish(topic, request_data["payload"], 1)
         return jsonify(result)
-
-    @app.route("/logs")
-    def logs():
-        utils.data["active_page"] = "logs"
-        utils.data["logs"] = reversed(mqtt_logs)
-        return utils.render_template_if_authenticated("logs.jinja")
 
     return app
