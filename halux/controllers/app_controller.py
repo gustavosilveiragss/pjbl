@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, redirect, make_response
+from models.device import Device
 import utils.consts as consts
 import utils.utils as utils
 from datetime import datetime
@@ -18,6 +19,11 @@ def create_app() -> Flask:
         template_folder="./templates/",
     )
 
+    app.config["SQLALCHEMY_DATABASE_URI"] = instance
+    app.config["TESTING"] = False
+    app.config["SECRET_KEY"] = "PJBL"
+    db.init_app(app)
+
     app.register_blueprint(iot, url_prefix="/iot")
     app.register_blueprint(users, url_prefix="/users")
     app.register_blueprint(devices, url_prefix="/devices")
@@ -26,10 +32,8 @@ def create_app() -> Flask:
     app.config["MQTT_BROKER_PORT"] = consts.BROKER_PORT
     app.config["MQTT_KEEPALIVE"] = consts.BROKER_KEEPALIVE
     app.config["MQTT_TLS_ENABLED"] = consts.BROKER_TLS_ENABLED
-    app.config["SQLALCHEMY_DATABASE_URI"] = instance
 
     mqtt_client.init_app(app)
-    db.init_app(app)
 
     @app.route("/")
     def index():
@@ -76,35 +80,29 @@ def create_app() -> Flask:
     def dashboard(device_id):
         utils.data["active_page"] = "dashboard"
 
-        d = None
-        for d_db in device:
-            if d_db["device_id"] == device_id:
-                d = d_db
-                break
-        if d is None or d["device_id"] == 1:
+        d = db.session.query(Device).filter(Device.device_id == device_id).first()
+        if d is None or d.device_id == 1:
             return redirect("/devices")
 
         utils.data["device"] = d
 
         utils.data["devices"] = [d]
-        for d_db in device:
-            if d_db["device_id"] != device_id and d_db["device_id"] != 1:
-                utils.data["devices"].append(d_db)
+        ds = db.session.query(Device).filter(Device.device_id != device_id, Device.device_id != 1).all()
+        if ds is not None:
+            utils.data["devices"] += ds
 
-        for d_s in device_sensor:
-            if d_s["device_id"] == device_id:
-                match d_s["sensor_model_id"]:
-                    case 1:
-                        utils.data["temperature"] = f"{(d_s['value'] or 0.0):.2f}"
-                    case 2:
-                        utils.data["humidity"] = f"{(d_s['value'] or 0.0):.2f}"
-                    case 3:
-                        utils.data["open"] = d_s["value"]
+        for d_s in d.device_sensors:
+            match d_s.sensor_model_id:
+                case 1:
+                    utils.data["temperature"] = f"{(float(d_s.value) or 0.0):.2f}"
+                case 2:
+                    utils.data["humidity"] = f"{(float(d_s.value) or 0.0):.2f}"
+                case 3:
+                    utils.data["open"] = float(d_s.value)
 
-        for d_a in device_actuator:
-            if d_a["device_id"] == device_id:
-                if d_a["actuator_model_id"] == 2:
-                    utils.data["frequency"] = d_a["value"]
+        for d_a in d.device_actuators:
+            if d_a.actuator_model_id == 2:
+                utils.data["frequency"] = d_a.value
 
         return utils.render_template_if_authenticated("dashboard.jinja")
 
