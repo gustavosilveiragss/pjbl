@@ -6,7 +6,7 @@ db = SQLAlchemy()
 
 Base = declarative_base()
 
-instance = "mysql+pymysql://halux:halux@localhost:3306/pjbl"
+instance = "mysql+pymysql://halux:halux@localhost:3306/halux"
 
 
 def create_db(app: Flask):
