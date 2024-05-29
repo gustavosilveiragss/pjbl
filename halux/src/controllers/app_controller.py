@@ -53,7 +53,11 @@ def create_app() -> Flask:
         username = request.json["username"]
         password = request.json["password"]
 
-        u = db.session.query(User).filter(User.username == username, User.password == password).first()
+        u = (
+            db.session.query(User)
+            .filter(User.username == username, User.password == password)
+            .first()
+        )
         if u is None:
             return jsonify({"status": "User not found"}), 400
 
@@ -70,7 +74,7 @@ def create_app() -> Flask:
         device = db.session.query(Device).filter(Device.device_id != 1).first()
         if device is not None:
             return redirect(f"/dashboard/{device.device_id}")
-        
+
         return redirect("/devices")
 
     @app.route("/dashboard/<int:device_id>")
@@ -84,7 +88,11 @@ def create_app() -> Flask:
         utils.data["device"] = d
 
         utils.data["devices"] = [d]
-        ds = db.session.query(Device).filter(Device.device_id != device_id, Device.device_id != 1).all()
+        ds = (
+            db.session.query(Device)
+            .filter(Device.device_id != device_id, Device.device_id != 1)
+            .all()
+        )
         if ds is not None:
             utils.data["devices"] += ds
 
@@ -135,7 +143,7 @@ def create_app() -> Flask:
             subtopic=subtopic,
             topicID=topicID,
             operation=operation,
-            payload=payload
+            payload=payload,
         )
 
         db.session.add(log)

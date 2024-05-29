@@ -11,6 +11,7 @@ logs = Blueprint(
     template_folder="./templates/",
 )
 
+
 @logs.route("/")
 def logs_list():
     utils.data["active_page"] = "logs"

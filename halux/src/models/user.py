@@ -1,6 +1,7 @@
 from datetime import datetime
 from models.db import Base, db
 
+
 class User(Base):
     __tablename__ = "user"
 

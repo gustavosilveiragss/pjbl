@@ -88,7 +88,9 @@ def delete_device():
         return jsonify({"status": "Cannot delete the central Halux device"}), 400
 
     db.session.query(DeviceSensor).filter(DeviceSensor.device_id == device_id).delete()
-    db.session.query(DeviceActuator).filter(DeviceActuator.device_id == device_id).delete()
+    db.session.query(DeviceActuator).filter(
+        DeviceActuator.device_id == device_id
+    ).delete()
     db.session.query(MqttLogs).filter(MqttLogs.device_id == device_id).delete()
     db.session.query(Device).filter(Device.device_id == device_id).delete()
     db.session.commit()
@@ -114,7 +116,7 @@ def create_device():
         created_at=datetime.now(),
         user_id=utils.get_user_id(),
         password="000",
-        permission_state=0
+        permission_state=0,
     )
 
     db.session.add(d)

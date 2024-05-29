@@ -43,7 +43,10 @@ def edit_user_route(user_id):
 def create_user():
     username = request.json["username"]
     if username == "admin":
-        return jsonify({"status": "Cannot create a user with the username 'admin'"}), 400
+        return (
+            jsonify({"status": "Cannot create a user with the username 'admin'"}),
+            400,
+        )
 
     password = request.json["password"]
 

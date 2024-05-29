@@ -10,6 +10,7 @@ def is_authenticated():
 def is_admin():
     return is_authenticated() and get_user_id() == 1
 
+
 def get_user_id():
     return int(request.cookies["user_id"]) if "user_id" in request.cookies else -1
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from models.db import Base, db
 
+
 class Device(Base):
     __tablename__ = "device"
 

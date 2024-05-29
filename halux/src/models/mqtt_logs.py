@@ -1,6 +1,7 @@
 from datetime import datetime
 from models.db import Base, db
 
+
 class MqttLogs(Base):
     __tablename__ = "mqtt_logs"
 
@@ -13,4 +14,3 @@ class MqttLogs(Base):
     payload = db.Column(db.String(255), nullable=False)
 
     device = db.relationship("Device", back_populates="mqtt_logs")
-    

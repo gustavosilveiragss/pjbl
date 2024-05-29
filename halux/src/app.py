@@ -5,4 +5,4 @@ import utils.consts as consts
 if __name__ == "__main__":
     app = create_app()
     create_db(app)
-    app.run(host='127.0.0.1', port=consts.PORT, debug=True)
+    app.run(host="127.0.0.1", port=consts.PORT, debug=True)
