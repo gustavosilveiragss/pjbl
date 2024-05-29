@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify, render_template, redirect, make_response
+from models.mqtt_logs import MqttLogs
+from models.user import User
 from models.device import Device
 import utils.consts as consts
 import utils.utils as utils
 from datetime import datetime
 from models.db import instance, db
 from models.mqtt import mqtt_client, topics_subscribe, handleMessage
-from models.fake_db import *
 from controllers.users_controller import users
 from controllers.devices_controller import devices
 from controllers.logs_controller import logs
@@ -52,17 +53,13 @@ def create_app() -> Flask:
         username = request.json["username"]
         password = request.json["password"]
 
-        u = None
-        for u_db in user:
-            if u_db["username"] == username and u_db["password"] == password:
-                u = u_db
-                break
+        u = db.session.query(User).filter(User.username == username, User.password == password).first()
         if u is None:
             return jsonify({"status": "User not found"}), 400
 
-        utils.data["user_id"] = u_db["user_id"]
+        utils.data["user_id"] = u.user_id
         resp = make_response(jsonify(status="ok"))
-        resp.set_cookie("user_id", str(u_db["user_id"]))
+        resp.set_cookie("user_id", str(u.user_id))
         return resp
 
     @app.route("/dashboard")
@@ -70,10 +67,10 @@ def create_app() -> Flask:
         utils.data["active_page"] = "dashboard"
 
         # Redirect to the first device that is not the central Halux device, if it exists
-        for d in device:
-            if d["device_id"] != 1:
-                return redirect("/dashboard/" + str(d["device_id"]))
-
+        device = db.session.query(Device).filter(Device.device_id != 1).first()
+        if device is not None:
+            return redirect(f"/dashboard/{device.device_id}")
+        
         return redirect("/devices")
 
     @app.route("/dashboard/<int:device_id>")
@@ -132,17 +129,17 @@ def create_app() -> Flask:
 
         print(f"Received message: {topic}/{subtopic}/{topicID}/{operation} - {payload}")
 
-        log = dict(
-            mqtt_log_id=len(mqtt_logs) + 1,
+        log = MqttLogs(
             created_at=datetime.now(),
             topic=topic,
             subtopic=subtopic,
-            device_id=topicID,
+            topicID=topicID,
             operation=operation,
-            payload=payload,
+            payload=payload
         )
 
-        mqtt_logs.append(log)
+        db.session.add(log)
+        db.session.commit()
 
         if subtopic == consts.REQUEST:
             handleMessage(client, topic, topicID, operation, payload)
