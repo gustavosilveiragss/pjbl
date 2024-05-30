@@ -6,7 +6,7 @@ import utils.consts as consts
 import utils.utils as utils
 from datetime import datetime
 from models.db import instance, db
-from models.mqtt import mqtt_client, topics_subscribe, handleMessage
+from models.mqtt import mqtt_client, topics_subscribe, handle_message
 from controllers.users_controller import users
 from controllers.devices_controller import devices
 from controllers.logs_controller import logs
@@ -141,16 +141,17 @@ def create_app() -> Flask:
             created_at=datetime.now(),
             topic=topic,
             subtopic=subtopic,
-            topicID=topicID,
+            device_id=topicID,
             operation=operation,
             payload=payload,
         )
 
-        db.session.add(log)
-        db.session.commit()
+        with app.app_context():
+            db.session.add(log)
+            db.session.commit()
 
         if subtopic == consts.REQUEST:
-            handleMessage(client, topic, topicID, operation, payload)
+            handle_message(topic, topicID, operation, payload, app)
 
     @app.route("/publish_mqtt", methods=["POST"])
     def publish_message():
@@ -164,7 +165,6 @@ def create_app() -> Flask:
             return jsonRes
 
         topic = topic[:-1] + "R"
-        print(topic)
 
         result, _ = mqtt_client.publish(topic, request_data["payload"], 1)
         return jsonify(result)
