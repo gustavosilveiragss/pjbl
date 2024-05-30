@@ -6,6 +6,7 @@ from models.device_actuator import DeviceActuator
 from models.sensor_model import SensorModel
 from models.actuator_model import ActuatorModel
 from utils import utils
+import utils.consts as consts
 from datetime import datetime
 from models.db import db
 from sqlalchemy import asc
@@ -74,7 +75,18 @@ def edit_device():
     if d is None:
         return jsonify({"status": "Device not found"}), 400
 
+    log = MqttLogs(
+        created_at=datetime.now(),
+        topic=consts.TOP_DEVICE,
+        subtopic=consts.CRUD,
+        device_id=1,
+        operation=consts.WRITE,
+        payload=f"Device ({d.device_id}) name updated from '{d.device_name}' to '{device_name}'",
+    )
+
     d.device_name = device_name
+
+    db.session.add(log)
     db.session.commit()
 
     return jsonify({"status": "OK"})
@@ -87,12 +99,24 @@ def delete_device():
     if device_id == 1:
         return jsonify({"status": "Cannot delete the central Halux device"}), 400
 
+    log = MqttLogs(
+        created_at=datetime.now(),
+        topic=consts.TOP_DEVICE,
+        subtopic=consts.CRUD,
+        device_id=1,
+        operation=consts.DELETE,
+        payload=f"Device ({device_id}) deleted",
+    )
+
     db.session.query(DeviceSensor).filter(DeviceSensor.device_id == device_id).delete()
     db.session.query(DeviceActuator).filter(
         DeviceActuator.device_id == device_id
     ).delete()
     db.session.query(MqttLogs).filter(MqttLogs.device_id == device_id).delete()
     db.session.query(Device).filter(Device.device_id == device_id).delete()
+
+    db.session.add(log)
+
     db.session.commit()
 
     return jsonify({"status": "OK"})
@@ -148,6 +172,16 @@ def create_device():
             )
         )
 
+    log = MqttLogs(
+        created_at=datetime.now(),
+        topic=consts.TOP_DEVICE,
+        subtopic=consts.CRUD,
+        device_id=1,
+        operation=consts.WRITE,
+        payload=f"Device ({d.device_id}) created",
+    )
+
+    db.session.add(log)
     db.session.commit()
 
     return jsonify({"status": "OK"})

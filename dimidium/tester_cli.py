@@ -13,10 +13,10 @@ def permissionState():
 
     match choice:
         case "1":
-            utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.WRITE, "true", callback=lambda msg: print(msg))
+            utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.WRITE, "1", callback=lambda msg: print(msg))
             permissionState()
         case "2":
-            utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.WRITE, "false", callback=lambda msg: print(msg))
+            utils.emitReq(client, utils.TOP_PERMISSION_STATE, utils.WRITE, "0", callback=lambda msg: print(msg))
             permissionState()
         case "3":
             init_cli()
@@ -152,7 +152,7 @@ def init_cli():
             init_cli()
             return
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv5, client_id="2")
+client = mqtt.Client("2", protocol=mqtt.MQTTv5)
 
 client.connect(utils.BROKER_URL, port=utils.BROKER_PORT)
 

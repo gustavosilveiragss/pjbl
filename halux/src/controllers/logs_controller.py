@@ -5,6 +5,7 @@ from utils import utils
 import utils.consts as consts
 from models.db import db
 from models.mqtt_logs import MqttLogs
+from sqlalchemy import desc
 
 logs = Blueprint(
     name="logs",
@@ -21,6 +22,8 @@ valid_topics = [
     consts.TOP_FREQUENCY,
     consts.TOP_TEMPERATURE,
     consts.TOP_HUMIDITY,
+    consts.TOP_DEVICE,
+    consts.TOP_USER,
 ]
 
 valid_subtopics = [consts.REQUEST, consts.RESPONSE, consts.CRUD]
@@ -37,7 +40,7 @@ def logs_list():
     device_id = request.args.get("device_id")
     operation = request.args.get("operation")
 
-    query = db.session.query(MqttLogs).order_by(MqttLogs.created_at)
+    query = db.session.query(MqttLogs).order_by(desc(MqttLogs.created_at))
 
     if start_date:
         query = query.filter(MqttLogs.created_at >= start_date)
