@@ -18,6 +18,8 @@ TOP_HUMIDITY = "HUMIDITY"
 REQUEST = "REQ"
 READ = "R"
 WRITE = "W"
+DELETE = "D"
 RESPONSE = "RES"
+CRUD = "CRUD"
 
 RESPONSE_OK = '{"status": "OK"}'

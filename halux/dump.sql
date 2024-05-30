@@ -145,7 +145,7 @@ CREATE TABLE `mqtt_logs` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `topic` varchar(255) NOT NULL,
   `subtopic` varchar(255) NOT NULL,
-  `device_id` int NOT NULL,
+  `device_id` int NULL,
   `operation` varchar(255) NOT NULL,
   `payload` varchar(255) NOT NULL,
   PRIMARY KEY (`mqtt_log_id`),

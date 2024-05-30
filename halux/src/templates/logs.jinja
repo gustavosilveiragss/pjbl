@@ -1,6 +1,54 @@
 {% extends "base.jinja" %}
 {% block title %}Logs{% endblock %}
 {% block content %}
+<form method="GET" action="/logs">
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+
+    <label for="topic">Topic:</label>
+    <select id="topic" name="topic">
+        <option value="">----</option>
+        {% for topic in data.topics %}
+        <option value="{{ topic }}" {% if request.args.get('topic', '' )==topic %}selected{% endif %}>{{ topic }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <label for="subtopic">Subtopic:</label>
+    <select id="subtopic" name="subtopic">
+        <option value="">----</option>
+        {% for subtopic in data.subtopics %}
+        <option value="{{ subtopic }}" {% if request.args.get('subtopic', '' )==subtopic %}selected{% endif %}>{{
+            subtopic }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <label for="device_id">Device ID:</label>
+    <select id="device_id" name="device_id">
+        <option value="">----</option>
+        {% for d in data.devices %}
+        <option value="{{ d.device_id }}" {% if request.args.get('device_id', '' )==d.device_id|string %}selected{% endif %}>{{
+            d.device_name }} ({{ d.device_id }})
+        </option>
+        {% endfor %}
+    </select>
+
+    <label for="operation">Operation:</label>
+    <select id="operation" name="operation">
+        <option value="">----</option>
+        {% for operation in data.operations %}
+        <option value="{{ operation }}" {% if request.args.get('operation', '' )==operation %}selected{% endif %}>{{
+            operation }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <input type="submit" value="Filter">
+</form>
 <table>
     <tr>
         <th>Timestamp</th>
@@ -15,7 +63,7 @@
         <td>{{ log.created_at }}</td>
         <td>{{ log.topic }}</td>
         <td>{{ log.subtopic }}</td>
-        <td>{{ log.device_id }}</td>
+        <td>{{ log.device_id|default('-') }}</td>
         <td>{{ log.operation }}</td>
         <td>{{ log.payload }}</td>
     </tr>
