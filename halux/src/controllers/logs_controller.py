@@ -5,6 +5,7 @@ from utils import utils
 import utils.consts as consts
 from models.db import db
 from models.mqtt_logs import MqttLogs
+from models.user import User
 from sqlalchemy import desc
 
 logs = Blueprint(
@@ -63,6 +64,12 @@ def logs_list():
 
     if operation and operation in valid_operations:
         query = query.filter(MqttLogs.operation == operation)
+
+    role = (
+        db.session.query(User.role).filter(User.user_id == utils.get_user_id()).first()
+    )
+    if role[0] == "statistics":
+        query = query.filter(MqttLogs.subtopic != consts.CRUD)
 
     mqtt_logs = query.all()
 

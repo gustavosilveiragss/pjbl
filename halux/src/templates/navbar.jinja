@@ -5,15 +5,18 @@
 </script>
 
 <div class="navbar" id="app-navbar">
+    {% if "user_id" in cookies %}
     <a {% if data.active_page=="dashboard" %}class="active" {% else %}class="disabled" {% endif %}
         href="/">Dashboard</a>
     <a {% if data.active_page=="logs" %}class="active" {% else %}class="disabled" {% endif %} href="/logs">Logs</a>
+    {% if cookies.user_id == "1" %}
     <a {% if data.active_page=="devices" %}class="active" {% else %}class="disabled" {% endif %}
         href="/devices">Devices</a>
-    {% if cookies.user_id == "1" %}
     <a {% if data.active_page=="users" %}class="active" {% else %}class="disabled" {% endif %} href="/users">Users</a>
     <a href="javascript:void(0);" class="icon" onclick="expandNavBar()">
         <i class="fa fa-bars"></i>
     </a>
     {% endif %}
+    {% endif %}
+    <a href="/logout">Logout</a>
 </div>

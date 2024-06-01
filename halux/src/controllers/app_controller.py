@@ -48,6 +48,12 @@ def create_app() -> Flask:
         utils.data["active_page"] = ""
         return render_template("login.jinja", data=utils.data, cookies=request.cookies)
 
+    @app.route("/logout")
+    def logout():
+        resp = redirect("/login")
+        resp.delete_cookie("user_id")
+        return resp
+
     @app.route("/authenticate", methods=["POST"])
     def authenticate():
         username = request.json["username"]
@@ -61,7 +67,6 @@ def create_app() -> Flask:
         if u is None:
             return jsonify({"status": "User not found"}), 400
 
-        utils.data["user_id"] = u.user_id
         resp = make_response(jsonify(status="ok"))
         resp.set_cookie("user_id", str(u.user_id))
         return resp
@@ -109,7 +114,13 @@ def create_app() -> Flask:
             if d_a.actuator_model_id == 2:
                 utils.data["frequency"] = d_a.value
 
-        return utils.render_template_if_authenticated("dashboard.jinja")
+        user_id = utils.get_user_id()
+        role = db.session.query(User.role).filter(User.user_id == user_id).first()
+        can_send_commands = role[0] != "statistics"
+
+        return utils.render_template_if_authenticated(
+            "dashboard.jinja", can_send_commands=can_send_commands
+        )
 
     @mqtt_client.on_connect()
     def handle_connect(client, userdata, flags, rc):

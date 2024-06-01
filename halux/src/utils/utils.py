@@ -8,11 +8,11 @@ def get_user_id():
 
 
 def is_authenticated():
-    return "user_id" in request.cookies and get_user_id() >= 1
+    return get_user_id() >= 1
 
 
 def is_admin():
-    return is_authenticated() and get_user_id() == 1
+    return get_user_id() == 1
 
 
 def render_template_if_authenticated(template: str, **kwargs):

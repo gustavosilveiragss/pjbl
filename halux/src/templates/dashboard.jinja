@@ -44,14 +44,14 @@
         <h2>Device Config</h2>
         <p>Password:</p>
         <div class="input-field">
-            <input type="text" id="password" name="password" placeholder=" " value="{{ data.device.password }}"
-                required>
+            <input type="text" id="password" name="password" placeholder=" " value="{{ data.device.password }}" required
+                {% if not can_send_commands %} readonly {% endif %}>
             <label for="password">Sequence</label>
         </div>
         <p>Frequency:</p>
         <div class="input-field">
             <input type="text" id="frequency" name="frequency" placeholder=" " value="{{ data.frequency or '' }}"
-                required>
+                required {% if not can_send_commands %} readonly {% endif %}>
             <label for="frequency">Hertz</label>
         </div>
     </div>

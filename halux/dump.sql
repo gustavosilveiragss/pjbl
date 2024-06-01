@@ -216,7 +216,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'2024-05-01 03:00:00','admin','admin','admin'),(2,'2024-05-01 03:00:00','user','user','user');
+INSERT INTO `user` VALUES (1,'2024-05-01 03:00:00','admin','admin','admin'),(2,'2024-05-01 03:00:00','operator','operator','operator'),(3,'2024-05-01 03:00:00','statistics','statistics','statistics');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
