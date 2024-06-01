@@ -6,6 +6,12 @@
     <input type="text" id="username" name="username" value=''>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" value=''>
+    <label for="role">Role:</label>
+    <select id="role" name="role" value="operator">
+        <option value="operator">Operador</option>
+        <option value="statistics">Statistics</option>
+    </select>
+
     <input type="submit" value="Submit">
 </form>
 
@@ -15,6 +21,7 @@
 
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
 
         fetch('/users/new_user', {
             method: 'POST',
@@ -24,6 +31,7 @@
             body: JSON.stringify({
                 username,
                 password,
+                role,
             }),
         }).then(response => {
             if (response.ok) {

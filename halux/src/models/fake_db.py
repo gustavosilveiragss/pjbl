@@ -77,9 +77,9 @@ mqtt_logs = [
         mqtt_log_id=1,
         created_at="2024-05-01 00:00:00",
         topic="PERMISSION_STATE",
-        subtopic="REQ",
+        subtopic="CRUD",
         device_id=2,
-        operation="W",
+        operation="C",
         payload="1",
     ),
     dict(
