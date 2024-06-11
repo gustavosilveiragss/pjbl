@@ -1,4 +1,4 @@
-# Protótipo do PJBL2
+# Protótipo do PJBL
 
 ## TEMA
 
@@ -20,3 +20,7 @@ Firmware do esp32
 #### Latim para _dedão_
 
 Front-end e back-end em Flask
+
+## DIMIDIUM
+
+Apenas uma CLI para envio de MQTT, como se fosse o firmware
