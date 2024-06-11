@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from utils import utils
 from models.mqtt_logs import MqttLogs
 from datetime import datetime
-from models.fake_db import *
 from models.db import db
 from models.user import User
 import utils.consts as consts
